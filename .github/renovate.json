@@ -4,8 +4,7 @@
     ":semanticCommits",
     ":semanticCommitTypeAll(chore)",
     ":gitSignOff",
-    "group:all",
-    "schedule:nonOfficeHours"
+    "group:all"
   ],
   "timezone": "Europe/Berlin",
   "postUpdateOptions": [
