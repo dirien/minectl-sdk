@@ -15,7 +15,7 @@ require (
 	github.com/exoscale/egoscale v0.88.0
 	github.com/fatih/color v1.13.0
 	github.com/google/uuid v1.3.0
-	github.com/gophercloud/gophercloud v0.25.0
+	github.com/gophercloud/gophercloud v1.0.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/hetznercloud/hcloud-go v1.35.2
