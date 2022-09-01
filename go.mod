@@ -8,7 +8,7 @@ require (
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.11
 	github.com/Azure/go-autorest/autorest/to v0.4.0
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/aws/aws-sdk-go v1.44.89
+	github.com/aws/aws-sdk-go v1.44.90
 	github.com/civo/civogo v0.3.7
 	github.com/digitalocean/godo v1.83.0
 	github.com/dirien/ovh-go-sdk v0.1.1
