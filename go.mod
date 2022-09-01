@@ -9,7 +9,7 @@ require (
 	github.com/Azure/go-autorest/autorest/to v0.4.0
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/aws/aws-sdk-go v1.44.84
-	github.com/civo/civogo v0.3.6
+	github.com/civo/civogo v0.3.7
 	github.com/digitalocean/godo v1.83.0
 	github.com/dirien/ovh-go-sdk v0.1.1
 	github.com/exoscale/egoscale v0.88.0
