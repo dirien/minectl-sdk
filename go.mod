@@ -30,7 +30,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/vultr/govultr/v2 v2.17.2
 	go.uber.org/zap v1.23.0
-	golang.org/x/crypto v0.0.0-20220824171710-5757bc0c5503
+	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
 	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
 	google.golang.org/api v0.94.0
 )
