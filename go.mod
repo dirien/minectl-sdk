@@ -8,7 +8,7 @@ require (
 	github.com/Azure/go-autorest/autorest/azure/auth v0.5.11
 	github.com/Azure/go-autorest/autorest/to v0.4.0
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/aws/aws-sdk-go v1.44.90
+	github.com/aws/aws-sdk-go v1.44.91
 	github.com/civo/civogo v0.3.7
 	github.com/digitalocean/godo v1.83.0
 	github.com/dirien/ovh-go-sdk v0.1.1
@@ -23,7 +23,7 @@ require (
 	github.com/linode/linodego v1.9.1
 	github.com/melbahja/goph v1.3.0
 	github.com/oracle/oci-go-sdk/v50 v50.1.0
-	github.com/packethost/packngo v0.25.0
+	github.com/packethost/packngo v0.26.0
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.9
 	github.com/sethvargo/go-password v0.2.0
