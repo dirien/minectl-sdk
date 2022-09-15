@@ -3,7 +3,6 @@ package azure
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,15 +10,11 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/pkg/errors"
-
-	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2021-07-01/compute"
-	"github.com/Azure/azure-sdk-for-go/services/network/mgmt/2021-03-01/network"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2020-10-01/resources"
-	"github.com/Azure/go-autorest/autorest"
-	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/Azure/go-autorest/autorest/azure/auth"
-	"github.com/Azure/go-autorest/autorest/to"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/dirien/minectl-sdk/automation"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
@@ -28,18 +23,14 @@ import (
 
 type Azure struct {
 	subscriptionID string
-	authorizer     autorest.Authorizer
+	credential     *azidentity.DefaultAzureCredential
 	tmpl           *minctlTemplate.Template
 }
 
 func NewAzure(authFile string) (*Azure, error) {
-	authorizer, err := auth.NewAuthorizerFromFile(azure.PublicCloud.ResourceManagerEndpoint)
+	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
 		return nil, err
-	}
-	authInfo, err := readJSON(authFile)
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to read JSON")
 	}
 	tmpl, err := minctlTemplate.NewTemplateCloudConfig()
 	if err != nil {
@@ -47,26 +38,16 @@ func NewAzure(authFile string) (*Azure, error) {
 	}
 	zap.S().Infow("Azure set cloud-config template", "name", tmpl.Template.Name())
 	return &Azure{
-		subscriptionID: (*authInfo)["subscriptionId"].(string),
-		authorizer:     authorizer,
+		subscriptionID: os.Getenv("AZURE_SUBSCRIPTION_ID"),
+		credential:     cred,
 		tmpl:           tmpl,
 	}, nil
 }
 
-func readJSON(path string) (*map[string]interface{}, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to read file")
-	}
-	contents := make(map[string]interface{})
-	_ = json.Unmarshal(data, &contents)
-	return &contents, nil
-}
-
 func getTags(edition string) map[string]*string {
 	return map[string]*string{
-		common.InstanceTag: to.StringPtr("true"),
-		edition:            to.StringPtr("true"),
+		common.InstanceTag: to.Ptr("true"),
+		edition:            to.Ptr("true"),
 	}
 }
 
@@ -79,171 +60,144 @@ func getTagKeys(tags map[string]*string) []string {
 }
 
 func (a *Azure) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
-	groupsClient := resources.NewGroupsClient(a.subscriptionID)
-	groupsClient.Authorizer = a.authorizer
-
-	group, err := groupsClient.CreateOrUpdate(
-		context.Background(),
+	ctx := context.Background()
+	resourceGroupsClient, err := armresources.NewResourceGroupsClient(a.subscriptionID, a.credential, nil)
+	if err != nil {
+		return nil, err
+	}
+	group, err := resourceGroupsClient.CreateOrUpdate(
+		ctx,
 		fmt.Sprintf("%s-rg", args.MinecraftResource.GetName()),
-		resources.Group{
-			Response: autorest.Response{},
-			Location: to.StringPtr(args.MinecraftResource.GetRegion()),
-			Tags:     getTags(args.MinecraftResource.GetEdition()),
-		})
+		armresources.ResourceGroup{
+			Location: to.Ptr(args.MinecraftResource.GetRegion()),
+		}, nil)
 	if err != nil {
 		return nil, err
 	}
 	zap.S().Infow("Azure resource group created", "name", group.Name)
 
-	virtualNetworksClient := network.NewVirtualNetworksClient(a.subscriptionID)
-	virtualNetworksClient.Authorizer = a.authorizer
-
-	virtualNetworksCreateOrUpdateFuture, err := virtualNetworksClient.CreateOrUpdate(
-		context.Background(),
-		to.String(group.Name),
+	virtualNetworkClient, err := armnetwork.NewVirtualNetworksClient(a.subscriptionID, a.credential, nil)
+	if err != nil {
+		return nil, err
+	}
+	vnetPoller, err := virtualNetworkClient.BeginCreateOrUpdate(
+		ctx,
+		*group.Name,
 		fmt.Sprintf("%s-vnet", args.MinecraftResource.GetName()),
-		network.VirtualNetwork{
-			Name:     to.StringPtr(fmt.Sprintf("%s-vnet", args.MinecraftResource.GetName())),
-			Location: to.StringPtr(args.MinecraftResource.GetRegion()),
+		armnetwork.VirtualNetwork{
+			Name:     to.Ptr(fmt.Sprintf("%s-vnet", args.MinecraftResource.GetName())),
+			Location: to.Ptr(args.MinecraftResource.GetRegion()),
 			Tags:     getTags(args.MinecraftResource.GetEdition()),
-			VirtualNetworkPropertiesFormat: &network.VirtualNetworkPropertiesFormat{
-				AddressSpace: &network.AddressSpace{
-					AddressPrefixes: &[]string{"10.0.0.0/8"},
+			Properties: &armnetwork.VirtualNetworkPropertiesFormat{
+				AddressSpace: &armnetwork.AddressSpace{
+					AddressPrefixes: []*string{to.Ptr("10.0.0.0/8")},
+				},
+				Subnets: []*armnetwork.Subnet{
+					{
+						Name: to.Ptr(fmt.Sprintf("%s-snet", args.MinecraftResource.GetName())),
+						Properties: &armnetwork.SubnetPropertiesFormat{
+							AddressPrefix: to.Ptr("10.0.0.0/16"),
+						},
+					},
 				},
 			},
-		})
+		},
+		nil,
+	)
 	if err != nil {
 		return nil, err
 	}
-	err = virtualNetworksCreateOrUpdateFuture.WaitForCompletionRef(context.Background(), virtualNetworksClient.Client)
-	if err != nil {
-		return nil, err
-	}
-	vnet, err := virtualNetworksCreateOrUpdateFuture.Result(virtualNetworksClient)
+	vnet, err := vnetPoller.PollUntilDone(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 	zap.S().Infow("Azure virtual network created", "name", vnet.Name)
 
-	subnetsClient := network.NewSubnetsClient(a.subscriptionID)
-	subnetsClient.Authorizer = a.authorizer
-	subnetsCreateOrUpdateFuture, err := subnetsClient.CreateOrUpdate(
-		context.Background(),
-		to.String(group.Name),
-		to.String(vnet.Name),
-		fmt.Sprintf("%s-snet", args.MinecraftResource.GetName()),
-		network.Subnet{
-			SubnetPropertiesFormat: &network.SubnetPropertiesFormat{
-				AddressPrefix: to.StringPtr("10.0.0.0/16"),
-			},
-		})
+	publicIPAddressesClient, err := armnetwork.NewPublicIPAddressesClient(a.subscriptionID, a.credential, nil)
 	if err != nil {
 		return nil, err
 	}
-
-	err = subnetsCreateOrUpdateFuture.WaitForCompletionRef(context.Background(), subnetsClient.Client)
-	if err != nil {
-		return nil, err
-	}
-	subnet, err := subnetsCreateOrUpdateFuture.Result(subnetsClient)
-	if err != nil {
-		return nil, err
-	}
-	zap.S().Infow("Azure subnetwork created", "name", subnet.Name)
-
-	ipClient := network.NewPublicIPAddressesClient(a.subscriptionID)
-	ipClient.Authorizer = a.authorizer
-	publicIPAddressesCreateOrUpdateFuture, err := ipClient.CreateOrUpdate(
-		context.Background(),
-		to.String(group.Name),
+	publicIPAdressPoller, err := publicIPAddressesClient.BeginCreateOrUpdate(
+		ctx,
+		*group.Name,
 		fmt.Sprintf("%s-ip", args.MinecraftResource.GetName()),
-		network.PublicIPAddress{
-			Name:     to.StringPtr(fmt.Sprintf("%s-ip", args.MinecraftResource.GetName())),
-			Location: to.StringPtr(args.MinecraftResource.GetRegion()),
-			PublicIPAddressPropertiesFormat: &network.PublicIPAddressPropertiesFormat{
-				PublicIPAddressVersion:   network.IPVersionIPv4,
-				PublicIPAllocationMethod: network.IPAllocationMethodStatic,
+		armnetwork.PublicIPAddress{
+			Name:     to.Ptr(fmt.Sprintf("%s-ip", args.MinecraftResource.GetName())),
+			Location: to.Ptr(args.MinecraftResource.GetRegion()),
+			Properties: &armnetwork.PublicIPAddressPropertiesFormat{
+				PublicIPAddressVersion:   to.Ptr(armnetwork.IPVersionIPv4),
+				PublicIPAllocationMethod: to.Ptr(armnetwork.IPAllocationMethodStatic),
 			},
 			Tags: getTags(args.MinecraftResource.GetEdition()),
-		},
+		}, nil,
 	)
 	if err != nil {
 		return nil, err
 	}
-
-	err = publicIPAddressesCreateOrUpdateFuture.WaitForCompletionRef(context.Background(), ipClient.Client)
-	if err != nil {
-		return nil, err
-	}
-	ip, err := publicIPAddressesCreateOrUpdateFuture.Result(ipClient)
+	ip, err := publicIPAdressPoller.PollUntilDone(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 	zap.S().Infow("Azure public ip created", "name", ip.Name)
 
-	nicClient := network.NewInterfacesClient(a.subscriptionID)
-	nicClient.Authorizer = a.authorizer
-	interfacesCreateOrUpdateFuture, err := nicClient.CreateOrUpdate(
+	interfacesClient, err := armnetwork.NewInterfacesClient(a.subscriptionID, a.credential, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	interfacesPoller, err := interfacesClient.BeginCreateOrUpdate(
 		context.Background(),
-		to.String(group.Name),
+		*group.Name,
 		fmt.Sprintf("%s-nic", args.MinecraftResource.GetName()),
-		network.Interface{
-			Name:     to.StringPtr(fmt.Sprintf("%s-nic", args.MinecraftResource.GetName())),
+		armnetwork.Interface{
+			Name:     to.Ptr(fmt.Sprintf("%s-nic", args.MinecraftResource.GetName())),
 			Location: group.Location,
-			InterfacePropertiesFormat: &network.InterfacePropertiesFormat{
-				IPConfigurations: &[]network.InterfaceIPConfiguration{
+			Properties: &armnetwork.InterfacePropertiesFormat{
+				IPConfigurations: []*armnetwork.InterfaceIPConfiguration{
 					{
-						Name: to.StringPtr("ipConfig1"),
-						InterfaceIPConfigurationPropertiesFormat: &network.InterfaceIPConfigurationPropertiesFormat{
-							Subnet:                    &subnet,
-							PrivateIPAllocationMethod: network.IPAllocationMethodDynamic,
-							PublicIPAddress:           &ip,
+						Name: to.Ptr("ipConfig1"),
+						Properties: &armnetwork.InterfaceIPConfigurationPropertiesFormat{
+							Subnet:                    vnet.Properties.Subnets[0],
+							PrivateIPAllocationMethod: to.Ptr(armnetwork.IPAllocationMethodDynamic),
+							PublicIPAddress:           &ip.PublicIPAddress,
 						},
 					},
 				},
 			},
 			Tags: getTags(args.MinecraftResource.GetEdition()),
-		})
+		}, nil)
 	if err != nil {
 		return nil, err
 	}
-	err = interfacesCreateOrUpdateFuture.WaitForCompletionRef(context.Background(), nicClient.Client)
-	if err != nil {
-		return nil, err
-	}
-	nic, err := interfacesCreateOrUpdateFuture.Result(nicClient)
+	nic, err := interfacesPoller.PollUntilDone(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 	zap.S().Infow("Azure network interface controller created", "name", nic.Name)
-
 	var mount string
 	var diskID *string
 	if args.MinecraftResource.GetVolumeSize() > 0 {
-		disksClient := compute.NewDisksClient(a.subscriptionID)
-		disksClient.Authorizer = a.authorizer
-		disksCreateOrUpdateFuture, err := disksClient.CreateOrUpdate(
+		disksClient, err := armcompute.NewDisksClient(a.subscriptionID, a.credential, nil)
+		if err != nil {
+			return nil, err
+		}
+		diskPoller, err := disksClient.BeginCreateOrUpdate(
 			context.Background(),
-			to.String(group.Name),
+			*group.Name,
 			fmt.Sprintf("%s-vol", args.MinecraftResource.GetName()),
-			compute.Disk{
+			armcompute.Disk{
 				Location: group.Location,
-				DiskProperties: &compute.DiskProperties{
-					CreationData: &compute.CreationData{
-						CreateOption: compute.DiskCreateOptionEmpty,
+				Properties: &armcompute.DiskProperties{
+					CreationData: &armcompute.CreationData{
+						CreateOption: to.Ptr(armcompute.DiskCreateOptionEmpty),
 					},
-					DiskSizeGB: to.Int32Ptr(int32(args.MinecraftResource.GetVolumeSize())),
+					DiskSizeGB: to.Ptr(int32(args.MinecraftResource.GetVolumeSize())),
 				},
-			})
+			}, nil)
 		if err != nil {
 			return nil, err
 		}
-
-		err = disksCreateOrUpdateFuture.WaitForCompletionRef(context.Background(), disksClient.Client)
-		if err != nil {
-			return nil, err
-		}
-		disk, err := disksCreateOrUpdateFuture.Result(disksClient)
+		disk, err := diskPoller.PollUntilDone(ctx, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -251,9 +205,10 @@ func (a *Azure) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 		mount = "sda"
 		zap.S().Infow("Azure managed disk created", "name", disk.Name)
 	}
-	vmClient := compute.NewVirtualMachinesClient(a.subscriptionID)
-	vmClient.Authorizer = a.authorizer
-
+	virtualMachinesClient, err := armcompute.NewVirtualMachinesClient(a.subscriptionID, a.credential, nil)
+	if err != nil {
+		return nil, err
+	}
 	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
 	if err != nil {
 		return nil, err
@@ -263,55 +218,54 @@ func (a *Azure) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 		return nil, err
 	}
 
-	priority := compute.VirtualMachinePriorityTypesRegular
-	var evictionPolicy compute.VirtualMachineEvictionPolicyTypes
+	priority := armcompute.VirtualMachinePriorityTypesRegular
+	var evictionPolicy armcompute.VirtualMachineEvictionPolicyTypes
 	if args.MinecraftResource.IsSpot() {
-		priority = compute.VirtualMachinePriorityTypesSpot
-		evictionPolicy = compute.VirtualMachineEvictionPolicyTypesDeallocate
+		priority = armcompute.VirtualMachinePriorityTypesSpot
+		evictionPolicy = armcompute.VirtualMachineEvictionPolicyTypesDeallocate
 	}
-	image := &compute.ImageReference{
-		Publisher: to.StringPtr("Canonical"),
-		Offer:     to.StringPtr("0001-com-ubuntu-minimal-jammy-daily"),
-		Sku:       to.StringPtr("minimal-22_04-daily-lts-gen2"),
-		Version:   to.StringPtr("latest"),
+	image := &armcompute.ImageReference{
+		Publisher: to.Ptr("Canonical"),
+		Offer:     to.Ptr("0001-com-ubuntu-minimal-jammy-daily"),
+		SKU:       to.Ptr("minimal-22_04-daily-lts-gen2"),
+		Version:   to.Ptr("latest"),
 	}
 	if args.MinecraftResource.IsArm() {
-		image.Offer = to.StringPtr("0001-com-ubuntu-server-arm-preview-focal")
-		image.Sku = to.StringPtr("20_04-lts")
+		image.Offer = to.Ptr("0001-com-ubuntu-server-arm-preview-focal")
+		image.SKU = to.Ptr("20_04-lts")
 	}
-
-	vmOptions := compute.VirtualMachine{
+	vmOptions := armcompute.VirtualMachine{
 		Location: group.Location,
-		VirtualMachineProperties: &compute.VirtualMachineProperties{
-			Priority:       priority,
-			EvictionPolicy: evictionPolicy,
-			HardwareProfile: &compute.HardwareProfile{
-				VMSize: compute.VirtualMachineSizeTypes(args.MinecraftResource.GetSize()),
+		Properties: &armcompute.VirtualMachineProperties{
+			Priority:       to.Ptr(priority),
+			EvictionPolicy: to.Ptr(evictionPolicy),
+			HardwareProfile: &armcompute.HardwareProfile{
+				VMSize: to.Ptr(armcompute.VirtualMachineSizeTypes(args.MinecraftResource.GetSize())),
 			},
-			StorageProfile: &compute.StorageProfile{
+			StorageProfile: &armcompute.StorageProfile{
 				ImageReference: image,
 			},
-			OsProfile: &compute.OSProfile{
-				ComputerName:  to.StringPtr(args.MinecraftResource.GetName()),
-				AdminUsername: to.StringPtr("ubuntu"),
-				CustomData:    to.StringPtr(base64.StdEncoding.EncodeToString([]byte(userData))),
-				LinuxConfiguration: &compute.LinuxConfiguration{
-					SSH: &compute.SSHConfiguration{
-						PublicKeys: &[]compute.SSHPublicKey{
+			OSProfile: &armcompute.OSProfile{
+				ComputerName:  to.Ptr(args.MinecraftResource.GetName()),
+				AdminUsername: to.Ptr("ubuntu"),
+				CustomData:    to.Ptr(base64.StdEncoding.EncodeToString([]byte(userData))),
+				LinuxConfiguration: &armcompute.LinuxConfiguration{
+					SSH: &armcompute.SSHConfiguration{
+						PublicKeys: []*armcompute.SSHPublicKey{
 							{
-								Path:    to.StringPtr("/home/ubuntu/.ssh/authorized_keys"),
-								KeyData: to.StringPtr(string(pubKeyFile)),
+								Path:    to.Ptr("/home/ubuntu/.ssh/authorized_keys"),
+								KeyData: to.Ptr(string(pubKeyFile)),
 							},
 						},
 					},
 				},
 			},
-			NetworkProfile: &compute.NetworkProfile{
-				NetworkInterfaces: &[]compute.NetworkInterfaceReference{
+			NetworkProfile: &armcompute.NetworkProfile{
+				NetworkInterfaces: []*armcompute.NetworkInterfaceReference{
 					{
 						ID: nic.ID,
-						NetworkInterfaceReferenceProperties: &compute.NetworkInterfaceReferenceProperties{
-							Primary: to.BoolPtr(true),
+						Properties: &armcompute.NetworkInterfaceReferenceProperties{
+							Primary: to.Ptr(true),
 						},
 					},
 				},
@@ -319,65 +273,72 @@ func (a *Azure) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 		},
 		Tags: getTags(args.MinecraftResource.GetEdition()),
 	}
-
 	if args.MinecraftResource.GetVolumeSize() > 0 {
-		vmOptions.StorageProfile.DataDisks = &[]compute.DataDisk{{
-			CreateOption: compute.DiskCreateOptionTypesAttach,
-			Lun:          to.Int32Ptr(0),
-			ManagedDisk: &compute.ManagedDiskParameters{
+		vmOptions.Properties.StorageProfile.DataDisks = []*armcompute.DataDisk{{
+			CreateOption: to.Ptr(armcompute.DiskCreateOptionTypesAttach),
+			Lun:          to.Ptr(int32(0)),
+			ManagedDisk: &armcompute.ManagedDiskParameters{
 				ID: diskID,
 			},
 		}}
 	}
 
-	virtualMachinesCreateOrUpdateFuture, err := vmClient.CreateOrUpdate(
+	vmPoller, err := virtualMachinesClient.BeginCreateOrUpdate(
 		context.Background(),
-		to.String(group.Name),
+		*group.Name,
 		args.MinecraftResource.GetName(),
-		vmOptions)
+		vmOptions,
+		nil,
+	)
 	if err != nil {
 		return nil, err
 	}
-	err = virtualMachinesCreateOrUpdateFuture.WaitForCompletionRef(context.Background(), vmClient.Client)
-	if err != nil {
-		return nil, err
-	}
-	instance, err := virtualMachinesCreateOrUpdateFuture.Result(vmClient)
+	instance, err := vmPoller.PollUntilDone(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 	zap.S().Infow("Azure virtual machine created", "name", instance.Name)
-
-	virtualMachinesStartFuture, err := vmClient.Start(context.Background(), to.String(group.Name), to.String(instance.Name))
+	vmStartPoller, err := virtualMachinesClient.BeginStart(
+		ctx,
+		*group.Name,
+		*instance.Name,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	_, err = vmStartPoller.PollUntilDone(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	err = virtualMachinesStartFuture.WaitForCompletionRef(context.Background(), vmClient.Client)
-	if err != nil {
-		return nil, err
-	}
-	zap.S().Infow("Azure virtual machine started", "name", instance.Name, "ip", ip.IPAddress, "id", instance.Name)
+	zap.S().Infow("Azure virtual machine started", "name", instance.Name, "ip", *ip.Properties.IPAddress, "id", instance.Name)
 
 	return &automation.ResourceResults{
-		ID:       to.String(instance.Name),
-		Name:     to.String(instance.Name),
-		Region:   to.String(group.Location),
-		PublicIP: to.String(ip.IPAddress),
+		ID:       *instance.Name,
+		Name:     *instance.Name,
+		Region:   *group.Location,
+		PublicIP: *ip.Properties.IPAddress,
 		Tags:     strings.Join(getTagKeys(instance.Tags), ","),
 	}, err
 }
 
 func (a *Azure) DeleteServer(id string, args automation.ServerArgs) error {
+	ctx := context.Background()
 	resourceGroupName := fmt.Sprintf("%s-rg", args.MinecraftResource.GetName())
-	zap.S().Infow("Azure delete resource group", "name", resourceGroupName)
-	groupsClient := resources.NewGroupsClient(a.subscriptionID)
-	groupsClient.Authorizer = a.authorizer
-	groupsDeleteFuture, err := groupsClient.Delete(context.Background(), resourceGroupName)
+	resourceGroupsClient, err := armresources.NewResourceGroupsClient(a.subscriptionID, a.credential, nil)
 	if err != nil {
 		return err
 	}
-	err = groupsDeleteFuture.WaitForCompletionRef(context.Background(), groupsClient.Client)
+	pollerResp, err := resourceGroupsClient.BeginDelete(
+		ctx,
+		resourceGroupName, &armresources.ResourceGroupsClientBeginDeleteOptions{
+			ForceDeletionTypes: to.Ptr("Microsoft.Compute/virtualMachines"),
+		})
+	if err != nil {
+		return err
+	}
+	_, err = pollerResp.PollUntilDone(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -386,34 +347,42 @@ func (a *Azure) DeleteServer(id string, args automation.ServerArgs) error {
 }
 
 func (a *Azure) ListServer() ([]automation.ResourceResults, error) {
-	vmClient := compute.NewVirtualMachinesClient(a.subscriptionID)
-	vmClient.Authorizer = a.authorizer
-	virtualMachineListResultPage, err := vmClient.ListAll(
-		context.Background(), "false")
+	ctx := context.Background()
+	virtualMachinesClient, err := armcompute.NewVirtualMachinesClient(a.subscriptionID, a.credential, nil)
 	if err != nil {
 		return nil, err
 	}
+	pager := virtualMachinesClient.NewListAllPager(&armcompute.VirtualMachinesClientListAllOptions{})
 	var result []automation.ResourceResults
-	for _, instance := range virtualMachineListResultPage.Values() {
-		for key := range instance.Tags {
-			if key == common.InstanceTag {
-				publicIPAddressesClient := network.NewPublicIPAddressesClient(a.subscriptionID)
-				publicIPAddressesClient.Authorizer = a.authorizer
-				ip, err := publicIPAddressesClient.Get(
-					context.Background(),
-					fmt.Sprintf("%s-rg", to.String(instance.Name)),
-					fmt.Sprintf("%s-ip", to.String(instance.Name)),
-					"")
-				if err != nil {
-					return nil, err
+	for pager.More() {
+		nextResult, err := pager.NextPage(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, instance := range nextResult.Value {
+			for key := range instance.Tags {
+				if key == common.InstanceTag {
+
+					publicIPAddressesClient, err := armnetwork.NewPublicIPAddressesClient(a.subscriptionID, a.credential, nil)
+					if err != nil {
+						return nil, err
+					}
+					ip, err := publicIPAddressesClient.Get(
+						context.Background(),
+						fmt.Sprintf("%s-rg", *instance.Name),
+						fmt.Sprintf("%s-ip", *instance.Name),
+						nil)
+					if err != nil {
+						return nil, err
+					}
+					result = append(result, automation.ResourceResults{
+						ID:       *instance.Name,
+						Name:     *instance.Name,
+						Region:   *instance.Location,
+						PublicIP: *ip.Properties.IPAddress,
+						Tags:     strings.Join(getTagKeys(instance.Tags), ","),
+					})
 				}
-				result = append(result, automation.ResourceResults{
-					ID:       to.String(instance.Name),
-					Name:     to.String(instance.Name),
-					Region:   to.String(instance.Location),
-					PublicIP: to.String(ip.IPAddress),
-					Tags:     strings.Join(getTagKeys(instance.Tags), ","),
-				})
 			}
 		}
 	}
@@ -461,35 +430,36 @@ func (a *Azure) UploadPlugin(id string, args automation.ServerArgs, plugin, dest
 }
 
 func (a *Azure) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
-	vmClient := compute.NewVirtualMachinesClient(a.subscriptionID)
-	vmClient.Authorizer = a.authorizer
-
-	instance, err := vmClient.Get(
+	virtualMachinesClient, err := armcompute.NewVirtualMachinesClient(a.subscriptionID, a.credential, nil)
+	if err != nil {
+		return nil, err
+	}
+	instance, err := virtualMachinesClient.Get(
 		context.Background(),
 		fmt.Sprintf("%s-rg", args.MinecraftResource.GetName()),
 		id,
-		compute.InstanceViewTypesInstanceView,
+		&armcompute.VirtualMachinesClientGetOptions{Expand: nil},
 	)
 	if err != nil {
 		return nil, err
 	}
-
-	ipClient := network.NewPublicIPAddressesClient(a.subscriptionID)
-	ipClient.Authorizer = a.authorizer
-	publicIPAddress, err := ipClient.Get(
-		context.Background(),
-		fmt.Sprintf("%s-rg", args.MinecraftResource.GetName()),
-		fmt.Sprintf("%s-ip", args.MinecraftResource.GetName()),
-		"")
+	publicIPAddressesClient, err := armnetwork.NewPublicIPAddressesClient(a.subscriptionID, a.credential, nil)
 	if err != nil {
 		return nil, err
 	}
-	zap.S().Infow("Get Azure minctl server", "name", instance.Name, "ip", publicIPAddress.IPAddress)
+	ip, err := publicIPAddressesClient.Get(
+		context.Background(),
+		fmt.Sprintf("%s-rg", *instance.Name),
+		fmt.Sprintf("%s-ip", *instance.Name),
+		nil)
+	if err != nil {
+		return nil, err
+	}
 	return &automation.ResourceResults{
-		ID:       to.String(instance.Name),
-		Name:     to.String(instance.Name),
-		Region:   args.MinecraftResource.GetRegion(),
-		PublicIP: to.String(publicIPAddress.IPAddress),
+		ID:       *instance.Name,
+		Name:     *instance.Name,
+		Region:   *instance.Location,
+		PublicIP: *ip.Properties.IPAddress,
 		Tags:     strings.Join(getTagKeys(instance.Tags), ","),
 	}, err
 }

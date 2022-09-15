@@ -3,10 +3,10 @@ module github.com/dirien/minectl-sdk
 go 1.19
 
 require (
-	github.com/Azure/azure-sdk-for-go v59.0.0+incompatible
-	github.com/Azure/go-autorest/autorest v0.11.28
-	github.com/Azure/go-autorest/autorest/azure/auth v0.5.11
-	github.com/Azure/go-autorest/autorest/to v0.4.0
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.3
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.1.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v1.1.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/aws/aws-sdk-go v1.44.97
 	github.com/civo/civogo v0.3.12
@@ -37,23 +37,18 @@ require (
 
 require (
 	cloud.google.com/go/compute v1.7.0 // indirect
-	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
-	github.com/Azure/go-autorest/autorest/adal v0.9.18 // indirect
-	github.com/Azure/go-autorest/autorest/azure/cli v0.4.5 // indirect
-	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
-	github.com/Azure/go-autorest/autorest/validation v0.3.1 // indirect
-	github.com/Azure/go-autorest/logger v0.2.1 // indirect
-	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/internal v1.0.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v1.0.0 // indirect
+	github.com/AzureAD/microsoft-authentication-library-for-go v0.5.1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/deepmap/oapi-codegen v1.9.1 // indirect
-	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/go-resty/resty/v2 v2.1.1-0.20191201195748-d7b97669fe48 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
-	github.com/golang-jwt/jwt/v4 v4.2.0 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
@@ -63,13 +58,14 @@ require (
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kr/fs v0.1.0 // indirect
+	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.11 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
-	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
 	github.com/ovh/go-ovh v1.1.0 // indirect
+	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 // indirect
 	github.com/pkg/sftp v1.13.4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.11.0 // indirect
