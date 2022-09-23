@@ -9,9 +9,9 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/aws/aws-sdk-go v1.44.104
+	github.com/aws/aws-sdk-go v1.44.105
 	github.com/civo/civogo v0.3.13
-	github.com/digitalocean/godo v1.85.0
+	github.com/digitalocean/godo v1.86.0
 	github.com/dirien/ovh-go-sdk v0.1.1
 	github.com/exoscale/egoscale v0.88.0
 	github.com/fatih/color v1.13.0
