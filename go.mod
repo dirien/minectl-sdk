@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.105
 	github.com/civo/civogo v0.3.13
 	github.com/digitalocean/godo v1.86.0
-	github.com/dirien/ovh-go-sdk v0.1.1
+	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.88.0
 	github.com/fatih/color v1.13.0
 	github.com/google/uuid v1.3.0
@@ -64,7 +64,7 @@ require (
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
-	github.com/ovh/go-ovh v1.1.0 // indirect
+	github.com/ovh/go-ovh v1.3.0 // indirect
 	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 // indirect
 	github.com/pkg/sftp v1.13.4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
