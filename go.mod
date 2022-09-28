@@ -9,7 +9,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/aws/aws-sdk-go v1.44.106
+	github.com/aws/aws-sdk-go v1.44.107
 	github.com/civo/civogo v0.3.13
 	github.com/digitalocean/godo v1.86.0
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -21,7 +21,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/hetznercloud/hcloud-go v1.35.3
 	github.com/ionos-cloud/sdk-go/v5 v5.1.12
-	github.com/linode/linodego v1.9.2
+	github.com/linode/linodego v1.9.3
 	github.com/melbahja/goph v1.3.0
 	github.com/oracle/oci-go-sdk/v50 v50.1.0
 	github.com/packethost/packngo v0.26.0
@@ -33,7 +33,7 @@ require (
 	go.uber.org/zap v1.23.0
 	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
-	google.golang.org/api v0.97.0
+	google.golang.org/api v0.98.0
 )
 
 require (
