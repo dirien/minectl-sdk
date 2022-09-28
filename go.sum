@@ -376,8 +376,8 @@ github.com/oracle/oci-go-sdk/v50 v50.1.0 h1:6WyLNxEmnUuc1fYYVTuIeH2iQiGVdwlE//qS
 github.com/oracle/oci-go-sdk/v50 v50.1.0/go.mod h1:5tboHcoGIrAUerGgH3Sdc6eJdhw5YyywE78g99hzHpw=
 github.com/ovh/go-ovh v1.3.0 h1:mvZaddk4E4kLcXhzb+cxBsMPYp2pHqiQpWYkInsuZPQ=
 github.com/ovh/go-ovh v1.3.0/go.mod h1:AxitLZ5HBRPyUd+Zl60Ajaag+rNTdVXWIkzfrVuTXWA=
-github.com/packethost/packngo v0.26.0 h1:jbPHPEd+KpoM2OBQ3EgbgEYiAUK7vpZ9XhqOMEbnk78=
-github.com/packethost/packngo v0.26.0/go.mod h1:/UHguFdPs6Lf6FOkkSEPnRY5tgS0fsVM+Zv/bvBrmt0=
+github.com/packethost/packngo v0.27.0 h1:wYHZuU37Ej9F0DTOc5sjPS4U3cRQcCTzYT97YqVdsaI=
+github.com/packethost/packngo v0.27.0/go.mod h1:/UHguFdPs6Lf6FOkkSEPnRY5tgS0fsVM+Zv/bvBrmt0=
 github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 h1:Qj1ukM4GlMWXNdMBuXcXfz/Kw9s1qm0CLY32QxuSImI=
 github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4/go.mod h1:N6UoU20jOqggOuDwUaBQpluzLNDqif3kq9z2wpdYEfQ=
 github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=
