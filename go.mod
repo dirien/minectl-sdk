@@ -24,7 +24,7 @@ require (
 	github.com/linode/linodego v1.9.3
 	github.com/melbahja/goph v1.3.0
 	github.com/oracle/oci-go-sdk/v50 v50.1.0
-	github.com/packethost/packngo v0.26.0
+	github.com/packethost/packngo v0.27.0
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.9
 	github.com/sethvargo/go-password v0.2.0
