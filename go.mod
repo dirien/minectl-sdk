@@ -3,13 +3,13 @@ module github.com/dirien/minectl-sdk
 go 1.19
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.3
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.4
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v1.0.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/aws/aws-sdk-go v1.44.112
+	github.com/aws/aws-sdk-go v1.44.113
 	github.com/civo/civogo v0.3.13
 	github.com/digitalocean/godo v1.86.0
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -32,7 +32,7 @@ require (
 	github.com/vultr/govultr/v2 v2.17.2
 	go.uber.org/zap v1.23.0
 	golang.org/x/crypto v0.0.0-20221005025214-4161e89ecf1b
-	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
+	golang.org/x/oauth2 v0.0.0-20221006150949-b44042a4b9c1
 	google.golang.org/api v0.98.0
 )
 
