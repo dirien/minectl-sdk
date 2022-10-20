@@ -9,7 +9,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/aws/aws-sdk-go v1.44.118
+	github.com/aws/aws-sdk-go v1.44.119
 	github.com/civo/civogo v0.3.14
 	github.com/digitalocean/godo v1.87.0
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -31,8 +31,8 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/vultr/govultr/v2 v2.17.2
 	go.uber.org/zap v1.23.0
-	golang.org/x/crypto v0.0.0-20221012134737-56aed061732a
-	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783
+	golang.org/x/crypto v0.1.0
+	golang.org/x/oauth2 v0.1.0
 	google.golang.org/api v0.100.0
 )
 
@@ -79,9 +79,9 @@ require (
 	go.opencensus.io v0.23.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/net v0.0.0-20221014081412-f15817d10f9b // indirect
-	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/net v0.1.0 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20221014213838-99cd37c6964a // indirect
