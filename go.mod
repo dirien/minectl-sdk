@@ -3,13 +3,13 @@ module github.com/dirien/minectl-sdk
 go 1.19
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.4
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v1.0.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/aws/aws-sdk-go v1.44.130
+	github.com/aws/aws-sdk-go v1.44.131
 	github.com/civo/civogo v0.3.16
 	github.com/digitalocean/godo v1.89.0
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -24,7 +24,7 @@ require (
 	github.com/linode/linodego v1.9.3
 	github.com/melbahja/goph v1.3.0
 	github.com/oracle/oci-go-sdk/v50 v50.1.0
-	github.com/packethost/packngo v0.28.1
+	github.com/packethost/packngo v0.29.0
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.9
 	github.com/sethvargo/go-password v0.2.0
