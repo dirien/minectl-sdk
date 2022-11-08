@@ -9,7 +9,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/aws/aws-sdk-go v1.44.131
+	github.com/aws/aws-sdk-go v1.44.132
 	github.com/civo/civogo v0.3.16
 	github.com/digitalocean/godo v1.89.0
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -26,7 +26,7 @@ require (
 	github.com/oracle/oci-go-sdk/v50 v50.1.0
 	github.com/packethost/packngo v0.29.0
 	github.com/pkg/errors v0.9.1
-	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.9
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.10
 	github.com/sethvargo/go-password v0.2.0
 	github.com/stretchr/testify v1.8.1
 	github.com/vultr/govultr/v2 v2.17.2
