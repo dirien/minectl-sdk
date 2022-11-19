@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -15,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/dirien/minectl-sdk/automation"
+	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
@@ -203,7 +203,8 @@ func addTagSpecifications(args automation.ServerArgs, resourceType string) []*ec
 func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) { //nolint: gocyclo
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
-	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
+
+	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
@@ -223,7 +224,7 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 
 	key, err := a.client.ImportKeyPair(&ec2.ImportKeyPairInput{
 		KeyName:           aws.String(fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName())),
-		PublicKeyMaterial: pubKeyFile,
+		PublicKeyMaterial: []byte(*publicKey),
 	})
 	if err != nil {
 		return nil, err
@@ -448,7 +449,7 @@ func (a *Aws) UpdateServer(id string, args automation.ServerArgs) error {
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), *i.Reservations[0].Instances[0].PublicIpAddress, "ubuntu")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, *i.Reservations[0].Instances[0].PublicIpAddress, "ubuntu")
 	err = remoteCommand.UpdateServer(args.MinecraftResource)
 	if err != nil {
 		return err
@@ -590,7 +591,7 @@ func (a *Aws) UploadPlugin(id string, args automation.ServerArgs, plugin, destin
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), *i.Reservations[0].Instances[0].PublicIpAddress, "ubuntu")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, *i.Reservations[0].Instances[0].PublicIpAddress, "ubuntu")
 
 	err = remoteCommand.TransferFile(plugin, filepath.Join(destination, filepath.Base(plugin)), args.MinecraftResource.GetSSHPort())
 	if err != nil {

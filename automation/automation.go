@@ -21,6 +21,7 @@ type Rcon struct {
 type ServerArgs struct {
 	ID                string
 	MinecraftResource *model.MinecraftResource
+	SSHPrivateKeyPath string
 }
 
 type ResourceResults struct {

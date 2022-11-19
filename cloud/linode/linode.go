@@ -4,17 +4,16 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/dirien/minectl-sdk/update"
-
 	"github.com/dirien/minectl-sdk/automation"
+	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
+	"github.com/dirien/minectl-sdk/update"
 	"github.com/linode/linodego"
 	"github.com/sethvargo/go-password/password"
 	"golang.org/x/oauth2"
@@ -48,12 +47,12 @@ func NewLinode(apiToken string) (*Linode, error) {
 
 func (l *Linode) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	ubuntuImage := "linode/ubuntu22.04"
-	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
+	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
 	key, err := l.client.CreateSSHKey(context.Background(), linodego.SSHKeyCreateOptions{
-		SSHKey: strings.TrimSpace(string(pubKeyFile)),
+		SSHKey: *publicKey,
 		Label:  fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()),
 	})
 	if err != nil {
@@ -208,7 +207,7 @@ func (l *Linode) UpdateServer(id string, args automation.ServerArgs) error {
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), instance.IPv4[0].String(), "root")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.IPv4[0].String(), "root")
 	err = remoteCommand.UpdateServer(args.MinecraftResource)
 	if err != nil {
 		return err
@@ -223,7 +222,7 @@ func (l *Linode) UploadPlugin(id string, args automation.ServerArgs, plugin, des
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), instance.IPv4[0].String(), "root")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.IPv4[0].String(), "root")
 	err = remoteCommand.TransferFile(plugin, filepath.Join(destination, filepath.Base(plugin)), args.MinecraftResource.GetSSHPort())
 	if err != nil {
 		return err

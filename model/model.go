@@ -55,9 +55,10 @@ type Server struct {
 
 // SSH represents a SSH configuration.
 type SSH struct {
-	Port      int      `yaml:"port"`
-	KeyFolder string   `yaml:"keyFolder"`
-	Fail2ban  Fail2ban `yaml:"fail2ban"`
+	Port          int      `yaml:"port"`
+	PublicKeyFile string   `yaml:"publickeyfile"`
+	PublicKey     string   `yaml:"publickey"`
+	Fail2ban      Fail2ban `yaml:"fail2ban"`
 }
 
 // Fail2ban represents a fail2ban configuration.
@@ -122,8 +123,12 @@ func (m *MinecraftResource) GetSSHPort() int {
 	return m.Spec.Server.SSH.Port
 }
 
-func (m *MinecraftResource) GetSSHKeyFolder() string {
-	return m.Spec.Server.SSH.KeyFolder
+func (m *MinecraftResource) GetSSHKeyFile() string {
+	return m.Spec.Server.SSH.PublicKeyFile
+}
+
+func (m *MinecraftResource) GetSSHPublicKey() string {
+	return m.Spec.Server.SSH.PublicKey
 }
 
 func (m *MinecraftResource) GetFail2Ban() Fail2ban {

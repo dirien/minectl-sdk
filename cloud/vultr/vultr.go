@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/dirien/minectl-sdk/automation"
+	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
@@ -39,12 +39,12 @@ func NewVultr(apiKey string) (*Vultr, error) {
 }
 
 func (v *Vultr) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
-	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
+	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
 	sshKey, err := v.client.SSHKey.Create(context.Background(), &govultr.SSHKeyReq{
-		SSHKey: strings.TrimSpace(string(pubKeyFile)),
+		SSHKey: *publicKey,
 		Name:   fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()),
 	})
 	if err != nil {
@@ -155,7 +155,7 @@ func (v *Vultr) UpdateServer(id string, args automation.ServerArgs) error {
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), instance.MainIP, "root")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.MainIP, "root")
 	err = remoteCommand.UpdateServer(args.MinecraftResource)
 	if err != nil {
 		return err
@@ -168,7 +168,7 @@ func (v *Vultr) UploadPlugin(id string, args automation.ServerArgs, plugin, dest
 	if err != nil {
 		return err
 	}
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), instance.MainIP, "root")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.MainIP, "root")
 	err = remoteCommand.TransferFile(plugin, filepath.Join(destination, filepath.Base(plugin)), args.MinecraftResource.GetSSHPort())
 	if err != nil {
 		return err

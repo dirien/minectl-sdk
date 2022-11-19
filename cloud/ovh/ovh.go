@@ -3,18 +3,16 @@ package ovh
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/dirien/minectl-sdk/update"
-
-	ovhsdk "github.com/dirien/ovh-go-sdk/pkg/sdk"
-
 	"github.com/dirien/minectl-sdk/automation"
+	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
+	"github.com/dirien/minectl-sdk/update"
+	ovhsdk "github.com/dirien/ovh-go-sdk/pkg/sdk"
 )
 
 type OVHcloud struct {
@@ -38,14 +36,14 @@ func NewOVHcloud(endpoint, appKey, appSecret, consumerKey, serviceName, region s
 }
 
 func (o *OVHcloud) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
-	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
+	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
 
 	key, err := o.client.CreateSSHKey(context.Background(), ovhsdk.SSHKeyCreateOptions{
 		Name:      fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()),
-		PublicKey: string(pubKeyFile),
+		PublicKey: *publicKey,
 	})
 	if err != nil {
 		return nil, err
@@ -245,7 +243,7 @@ func (o *OVHcloud) UpdateServer(id string, args automation.ServerArgs) error {
 	if err != nil {
 		return err
 	}
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), ip4, "ubuntu")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, ip4, "ubuntu")
 	err = remoteCommand.UpdateServer(args.MinecraftResource)
 	if err != nil {
 		return err
@@ -263,7 +261,7 @@ func (o *OVHcloud) UploadPlugin(id string, args automation.ServerArgs, plugin, d
 	if err != nil {
 		return err
 	}
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), ip4, "ubuntu")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, ip4, "ubuntu")
 
 	// as we are not allowed to login via root user, we need to add sudo to the command
 	source := filepath.Join("/tmp", filepath.Base(plugin))
