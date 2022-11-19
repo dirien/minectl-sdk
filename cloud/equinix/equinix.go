@@ -2,16 +2,15 @@ package equinix
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/dirien/minectl-sdk/update"
-
 	"github.com/dirien/minectl-sdk/automation"
+	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
+	"github.com/dirien/minectl-sdk/update"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/packethost/packngo"
 )
@@ -36,14 +35,14 @@ func NewEquinix(apiKey, project string) (*Equinix, error) {
 }
 
 func (e *Equinix) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
-	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
+	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
 	key, _, err := e.client.SSHKeys.Create(&packngo.SSHKeyCreateRequest{
 		Label:     fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()),
 		ProjectID: e.project,
-		Key:       string(pubKeyFile),
+		Key:       *publicKey,
 	})
 	if err != nil {
 		return nil, err
@@ -149,7 +148,7 @@ func (e *Equinix) UpdateServer(id string, args automation.ServerArgs) error {
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), getIP4(instance), "root")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, getIP4(instance), "root")
 	err = remoteCommand.UpdateServer(args.MinecraftResource)
 	if err != nil {
 		return err
@@ -174,7 +173,7 @@ func (e *Equinix) UploadPlugin(id string, args automation.ServerArgs, plugin, de
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), getIP4(instance), "root")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, getIP4(instance), "root")
 	err = remoteCommand.TransferFile(plugin, filepath.Join(destination, filepath.Base(plugin)), args.MinecraftResource.GetSSHPort())
 	if err != nil {
 		return err

@@ -2,16 +2,15 @@ package scaleway
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/dirien/minectl-sdk/update"
-
 	"github.com/dirien/minectl-sdk/automation"
+	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
+	"github.com/dirien/minectl-sdk/update"
 	account "github.com/scaleway/scaleway-sdk-go/api/account/v2alpha1"
 	"github.com/scaleway/scaleway-sdk-go/api/instance/v1"
 	"github.com/scaleway/scaleway-sdk-go/scw"
@@ -49,13 +48,13 @@ func NewScaleway(accessKey, secretKey, organizationID, region string) (*Scaleway
 }
 
 func (s *Scaleway) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
-	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
+	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
 	_, err = s.accountAPI.CreateSSHKey(&account.CreateSSHKeyRequest{
 		Name:      fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()),
-		PublicKey: string(pubKeyFile),
+		PublicKey: *publicKey,
 	})
 	if err != nil {
 		return nil, err
@@ -204,7 +203,7 @@ func (s *Scaleway) UpdateServer(id string, args automation.ServerArgs) error {
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), instance.Server.PublicIP.Address.String(), "root")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.Server.PublicIP.Address.String(), "root")
 	err = remoteCommand.UpdateServer(args.MinecraftResource)
 	if err != nil {
 		return err
@@ -220,7 +219,7 @@ func (s *Scaleway) UploadPlugin(id string, args automation.ServerArgs, plugin, d
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), instance.Server.PublicIP.Address.String(), "root")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.Server.PublicIP.Address.String(), "root")
 	err = remoteCommand.TransferFile(plugin, filepath.Join(destination, filepath.Base(plugin)), args.MinecraftResource.GetSSHPort())
 	if err != nil {
 		return err

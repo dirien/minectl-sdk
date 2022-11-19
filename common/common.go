@@ -19,6 +19,10 @@ func CreateServerNameWithTags(instanceName, label string) (id string) {
 	return fmt.Sprintf("%s|%s", instanceName, label)
 }
 
+func StringPtr(s string) *string {
+	return &s
+}
+
 func ExtractFieldsFromServername(id string) (label string, err error) {
 	fields := strings.Split(id, "|")
 	if len(fields) == 3 {

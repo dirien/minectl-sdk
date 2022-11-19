@@ -2,19 +2,17 @@ package civo
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"go.uber.org/zap"
-
-	"github.com/dirien/minectl-sdk/update"
-
 	"github.com/civo/civogo"
 	"github.com/dirien/minectl-sdk/automation"
+	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
+	"github.com/dirien/minectl-sdk/update"
+	"go.uber.org/zap"
 )
 
 type Civo struct {
@@ -39,11 +37,11 @@ func NewCivo(apiKey, region string) (*Civo, error) {
 }
 
 func (c *Civo) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
-	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
+	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
-	sshPubKey, err := c.client.NewSSHKey(fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()), string(pubKeyFile))
+	sshPubKey, err := c.client.NewSSHKey(fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()), *publicKey)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +216,7 @@ func (c *Civo) UpdateServer(id string, args automation.ServerArgs) error {
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), instance.PublicIP, "root")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.PublicIP, "root")
 	err = remoteCommand.UpdateServer(args.MinecraftResource)
 	if err != nil {
 		return err
@@ -233,7 +231,7 @@ func (c *Civo) UploadPlugin(id string, args automation.ServerArgs, plugin, desti
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), instance.PublicIP, "root")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.PublicIP, "root")
 	err = remoteCommand.TransferFile(plugin, filepath.Join(destination, filepath.Base(plugin)), args.MinecraftResource.GetSSHPort())
 	if err != nil {
 		return err

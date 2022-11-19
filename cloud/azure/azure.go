@@ -8,17 +8,17 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.uber.org/zap"
-
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/dirien/minectl-sdk/automation"
+	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
+	"go.uber.org/zap"
 )
 
 type Azure struct {
@@ -209,10 +209,11 @@ func (a *Azure) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 	if err != nil {
 		return nil, err
 	}
-	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
+	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
+
 	userData, err := a.tmpl.GetTemplate(args.MinecraftResource, &minctlTemplate.CreateUpdateTemplateArgs{Mount: mount, Name: minctlTemplate.GetTemplateCloudConfigName(args.MinecraftResource.IsProxyServer())})
 	if err != nil {
 		return nil, err
@@ -254,7 +255,7 @@ func (a *Azure) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 						PublicKeys: []*armcompute.SSHPublicKey{
 							{
 								Path:    to.Ptr("/home/ubuntu/.ssh/authorized_keys"),
-								KeyData: to.Ptr(string(pubKeyFile)),
+								KeyData: publicKey,
 							},
 						},
 					},
@@ -399,7 +400,7 @@ func (a *Azure) UpdateServer(id string, args automation.ServerArgs) error {
 	if err != nil {
 		return err
 	}
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), server.PublicIP, "ubuntu")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, server.PublicIP, "ubuntu")
 	err = remoteCommand.UpdateServer(args.MinecraftResource)
 	if err != nil {
 		return err
@@ -413,7 +414,7 @@ func (a *Azure) UploadPlugin(id string, args automation.ServerArgs, plugin, dest
 	if err != nil {
 		return err
 	}
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), server.PublicIP, "ubuntu")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, server.PublicIP, "ubuntu")
 
 	// as we are not allowed to login via root user, we need to add sudo to the command
 	source := filepath.Join("/tmp", filepath.Base(plugin))

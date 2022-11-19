@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/dirien/minectl-sdk/automation"
+	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
@@ -84,13 +85,13 @@ func (g *GCE) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 		return nil, err
 	}
 
-	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
+	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
 
 	_, err = g.user.Users.ImportSshPublicKey(fmt.Sprintf("users/%s", g.serviceAccountName), &oslogin.SshPublicKey{
-		Key:                string(pubKeyFile),
+		Key:                *publicKey,
 		ExpirationTimeUsec: 0,
 	}).Context(context.Background()).Do()
 	if err != nil {
@@ -355,37 +356,41 @@ func (g *GCE) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
-func (g *GCE) UpdateServer(id string, args automation.ServerArgs) error {
-	instancesListOp, err := g.client.Instances.List(g.projectID, args.MinecraftResource.GetRegion()).
+func (g *GCE) getInstanceList(id, region string) ([]*compute.Instance, error) {
+	instancesListOp, err := g.client.Instances.List(g.projectID, region).
 		Filter(fmt.Sprintf("(id=%s)", id)).
 		Context(context.Background()).
 		Do()
 	if err != nil {
+		return nil, err
+	}
+	return instancesListOp.Items, nil
+}
+
+func (g *GCE) UpdateServer(id string, args automation.ServerArgs) error {
+	instancesList, err := g.getInstanceList(id, args.MinecraftResource.GetRegion())
+	if err != nil {
 		return err
 	}
-	if len(instancesListOp.Items) == 1 {
-		instance := instancesListOp.Items[0]
-		remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), instance.NetworkInterfaces[0].AccessConfigs[0].NatIP, fmt.Sprintf("sa_%s", g.serviceAccountID))
+	if len(instancesList) == 1 {
+		instance := instancesList[0]
+		remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.NetworkInterfaces[0].AccessConfigs[0].NatIP, fmt.Sprintf("sa_%s", g.serviceAccountID))
 		err = remoteCommand.UpdateServer(args.MinecraftResource)
 		if err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
 func (g *GCE) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
-	instancesListOp, err := g.client.Instances.List(g.projectID, args.MinecraftResource.GetRegion()).
-		Filter(fmt.Sprintf("(id=%s)", id)).
-		Context(context.Background()).
-		Do()
+	instancesList, err := g.getInstanceList(id, args.MinecraftResource.GetRegion())
 	if err != nil {
 		return err
 	}
-	if len(instancesListOp.Items) == 1 {
-		instance := instancesListOp.Items[0]
-		remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), instance.NetworkInterfaces[0].AccessConfigs[0].NatIP, fmt.Sprintf("sa_%s", g.serviceAccountID))
+	if len(instancesList) == 1 {
+		instance := instancesList[0]
+		remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.NetworkInterfaces[0].AccessConfigs[0].NatIP, fmt.Sprintf("sa_%s", g.serviceAccountID))
 		err = remoteCommand.TransferFile(plugin, filepath.Join(destination, filepath.Base(plugin)), args.MinecraftResource.GetSSHPort())
 		if err != nil {
 			return err
@@ -398,7 +403,6 @@ func (g *GCE) UploadPlugin(id string, args automation.ServerArgs, plugin, destin
 			return err
 		}
 	}
-
 	return nil
 }
 

@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/dirien/minectl-sdk/automation"
+	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
@@ -64,7 +64,7 @@ func (i *IONOS) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 	if err != nil {
 		return nil, err
 	}
-	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
+	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (i *IONOS) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 						Properties: &ionoscloud.VolumeProperties{
 							Name:     ionoscloud.PtrString(fmt.Sprintf("%s-vol", args.MinecraftResource.GetName())),
 							Image:    ubuntuImage,
-							SshKeys:  &[]string{string(pubKeyFile)},
+							SshKeys:  &[]string{*publicKey},
 							Size:     ionoscloud.PtrFloat32(30),
 							Type:     ionoscloud.PtrString("HDD"),
 							UserData: ionoscloud.PtrString(base64.StdEncoding.EncodeToString([]byte(userData))),
@@ -217,7 +217,7 @@ func (i *IONOS) UpdateServer(id string, args automation.ServerArgs) error {
 	if err != nil {
 		return err
 	}
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), server.PublicIP, "ubuntu")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, server.PublicIP, "ubuntu")
 	err = remoteCommand.UpdateServer(args.MinecraftResource)
 	if err != nil {
 		return err
@@ -232,7 +232,7 @@ func (i *IONOS) UploadPlugin(id string, args automation.ServerArgs, plugin, dest
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), server.PublicIP, "ubuntu")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, server.PublicIP, "ubuntu")
 	err = remoteCommand.TransferFile(plugin, filepath.Join(destination, filepath.Base(plugin)), args.MinecraftResource.GetSSHPort())
 	if err != nil {
 		return err

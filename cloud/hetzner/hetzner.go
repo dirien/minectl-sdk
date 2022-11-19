@@ -3,17 +3,16 @@ package hetzner
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/dirien/minectl-sdk/update"
-
 	"github.com/dirien/minectl-sdk/automation"
+	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
+	"github.com/dirien/minectl-sdk/update"
 	"github.com/hetznercloud/hcloud-go/hcloud"
 )
 
@@ -36,13 +35,13 @@ func NewHetzner(apiKey string) (*Hetzner, error) {
 }
 
 func (h *Hetzner) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
-	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
+	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
 	key, _, err := h.client.SSHKey.Create(context.Background(), hcloud.SSHKeyCreateOpts{
 		Name:      fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()),
-		PublicKey: string(pubKeyFile),
+		PublicKey: *publicKey,
 	})
 	if err != nil {
 		return nil, err
@@ -210,7 +209,7 @@ func (h *Hetzner) UpdateServer(id string, args automation.ServerArgs) error {
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), instance.PublicNet.IPv4.IP.String(), "root")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.PublicNet.IPv4.IP.String(), "root")
 	err = remoteCommand.UpdateServer(args.MinecraftResource)
 	if err != nil {
 		return err
@@ -225,7 +224,7 @@ func (h *Hetzner) UploadPlugin(id string, args automation.ServerArgs, plugin, de
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), instance.PublicNet.IPv4.IP.String(), "root")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.PublicNet.IPv4.IP.String(), "root")
 	err = remoteCommand.TransferFile(plugin, filepath.Join(destination, filepath.Base(plugin)), args.MinecraftResource.GetSSHPort())
 	if err != nil {
 		return err

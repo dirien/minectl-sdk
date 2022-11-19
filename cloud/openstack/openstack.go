@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/dirien/minectl-sdk/automation"
+	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
@@ -103,14 +104,14 @@ func NewOpenStack(imageName string) (*OpenStack, error) {
 
 // CreateServer TODO: https://github.com/dirien/minectl/issues/299
 func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) { //nolint: gocyclo
-	pubKeyFile, err := os.ReadFile(fmt.Sprintf("%s.pub", args.MinecraftResource.GetSSHKeyFolder()))
+	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
 
 	keyPair, err := keypairs.Create(o.computeClient, keypairs.CreateOpts{
 		Name:      fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()),
-		PublicKey: string(pubKeyFile),
+		PublicKey: *publicKey,
 	}).Extract()
 	if err != nil {
 		return nil, err
@@ -566,7 +567,7 @@ func (o *OpenStack) UpdateServer(id string, args automation.ServerArgs) error {
 	if err != nil {
 		return err
 	}
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), server.PublicIP, "ubuntu")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, server.PublicIP, "ubuntu")
 	err = remoteCommand.UpdateServer(args.MinecraftResource)
 	if err != nil {
 		return err
@@ -580,7 +581,7 @@ func (o *OpenStack) UploadPlugin(id string, args automation.ServerArgs, plugin, 
 	if err != nil {
 		return err
 	}
-	remoteCommand := update.NewRemoteServer(args.MinecraftResource.GetSSHKeyFolder(), server.PublicIP, "ubuntu")
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, server.PublicIP, "ubuntu")
 
 	// as we are not allowed to login via root user, we need to add sudo to the command
 	source := filepath.Join("/tmp", filepath.Base(plugin))
