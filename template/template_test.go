@@ -4202,7 +4202,7 @@ spec:
     size: xxx
     ssh:
       port: 
-      keyfolder: xxx
+      publickeyfile: xxx
       fail2ban:
         bantime: 
         maxretry: 
@@ -4238,7 +4238,7 @@ spec:
     size: xxx
     ssh:
       port: 
-      keyfolder: xxx
+      publickeyfile: xxx
       fail2ban:
         bantime: 
         maxretry: 
@@ -4267,7 +4267,7 @@ spec:
     size: xxx
     ssh:
       port: 
-      keyfolder: xxx
+      publickeyfile: xxx
       fail2ban:
         bantime: 
         maxretry: 
@@ -4296,7 +4296,7 @@ spec:
     size: xxx
     ssh:
       port: 
-      keyfolder: xxx
+      publickeyfile: xxx
       fail2ban:
         bantime: 
         maxretry: 
@@ -4323,7 +4323,7 @@ spec:
     size: xxx
     ssh:
       port: 
-      keyfolder: xxx
+      publickeyfile: xxx
       fail2ban:
         bantime: 
         maxretry: 
