@@ -232,8 +232,8 @@ func (a *Azure) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 		Version:   to.Ptr("latest"),
 	}
 	if args.MinecraftResource.IsArm() {
-		image.Offer = to.Ptr("0001-com-ubuntu-server-arm-preview-focal")
-		image.SKU = to.Ptr("20_04-lts")
+		image.Offer = to.Ptr("0001-com-ubuntu-server-jammy")
+		image.SKU = to.Ptr("22_04-lts-arm64")
 	}
 	vmOptions := armcompute.VirtualMachine{
 		Location: group.Location,
