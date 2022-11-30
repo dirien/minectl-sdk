@@ -8,8 +8,8 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v1.0.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
-	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/aws/aws-sdk-go v1.44.146
+	github.com/Masterminds/sprig/v3 v3.2.3
+	github.com/aws/aws-sdk-go v1.44.149
 	github.com/civo/civogo v0.3.17
 	github.com/digitalocean/godo v1.91.1
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -42,7 +42,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.0.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v0.7.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
-	github.com/Masterminds/semver/v3 v3.1.1 // indirect
+	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -55,7 +55,7 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
-	github.com/huandu/xstrings v1.3.1 // indirect
+	github.com/huandu/xstrings v1.3.3 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kr/fs v0.1.0 // indirect
