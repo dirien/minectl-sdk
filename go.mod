@@ -9,7 +9,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
 	github.com/Masterminds/sprig/v3 v3.2.3
-	github.com/aws/aws-sdk-go v1.44.152
+	github.com/aws/aws-sdk-go v1.44.153
 	github.com/civo/civogo v0.3.18
 	github.com/digitalocean/godo v1.91.1
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -19,7 +19,7 @@ require (
 	github.com/gophercloud/gophercloud v1.1.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.1
-	github.com/hetznercloud/hcloud-go v1.37.0
+	github.com/hetznercloud/hcloud-go v1.38.0
 	github.com/ionos-cloud/sdk-go/v5 v5.1.12
 	github.com/linode/linodego v1.9.3
 	github.com/melbahja/goph v1.3.0
