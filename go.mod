@@ -5,12 +5,12 @@ go 1.19
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.2.0
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v1.0.0
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v1.1.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v4.0.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork v2.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
 	github.com/Masterminds/sprig/v3 v3.2.3
-	github.com/aws/aws-sdk-go v1.44.163
-	github.com/civo/civogo v0.3.20
+	github.com/aws/aws-sdk-go v1.44.168
+	github.com/civo/civogo v0.3.21
 	github.com/digitalocean/godo v1.93.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.88.0
@@ -20,10 +20,10 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/hetznercloud/hcloud-go v1.38.0
-	github.com/ionos-cloud/sdk-go/v5 v5.1.12
-	github.com/linode/linodego v1.9.3
+	github.com/ionos-cloud/sdk-go/v6 v6.1.3
+	github.com/linode/linodego v1.10.0
 	github.com/melbahja/goph v1.3.0
-	github.com/oracle/oci-go-sdk/v50 v50.1.0
+	github.com/oracle/oci-go-sdk/v65 v65.28.0
 	github.com/packethost/packngo v0.29.0
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.10
