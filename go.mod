@@ -20,10 +20,10 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/hetznercloud/hcloud-go v1.39.0
-	github.com/ionos-cloud/sdk-go/v5 v5.1.12
+	github.com/ionos-cloud/sdk-go/v6 v6.1.3
 	github.com/linode/linodego v1.10.0
 	github.com/melbahja/goph v1.3.0
-	github.com/oracle/oci-go-sdk/v50 v50.1.0
+	github.com/oracle/oci-go-sdk/v65 v65.28.0
 	github.com/packethost/packngo v0.29.0
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.10
