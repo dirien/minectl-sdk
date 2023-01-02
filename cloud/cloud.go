@@ -23,7 +23,7 @@ var cloudProvider = map[string]string{
 	"azure":     "Azure",
 	"oci":       "Oracle Cloud Infrastructure",
 	"ionos":     "IONOS Cloud",
-	"aws":       "Amazon WebServices",
+	"aws":       "Amazon Web Services",
 	"vexxhost":  "VEXXHOST",
 	"exoscale":  "Exoscale",
 	"multipass": "Ubuntu Multipass",

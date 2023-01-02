@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/dirien/minectl-sdk/automation"
 	"github.com/dirien/minectl-sdk/cloud"
 	"github.com/dirien/minectl-sdk/common"
@@ -26,21 +26,23 @@ import (
 const instanceNameTag = "Name"
 
 type Aws struct {
-	client *ec2.EC2
+	client *ec2.Client
 	tmpl   *minctlTemplate.Template
 	region string
 }
 
 // NewAWS creates an Aws and initialises an EC2 client
 func NewAWS(region string) (*Aws, error) {
-	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String(region),
-	})
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(region))
 	if err != nil {
 		return nil, err
 	}
 
-	ec2Svc := ec2.New(sess)
+	if err != nil {
+		return nil, err
+	}
+
+	ec2Svc := ec2.NewFromConfig(cfg)
 
 	tmpl, err := minctlTemplate.NewTemplateCloudConfig()
 	if err != nil {
@@ -55,28 +57,29 @@ func NewAWS(region string) (*Aws, error) {
 }
 
 func (a *Aws) ListServer() ([]automation.ResourceResults, error) {
+	var ctx = context.TODO()
 	var result []automation.ResourceResults
 	var nextToken *string
 
 	for {
 		input := &ec2.DescribeInstancesInput{
-			Filters: []*ec2.Filter{
+			Filters: []types.Filter{
 				{
 					Name:   aws.String(fmt.Sprintf("tag:%s", common.InstanceTag)),
-					Values: []*string{aws.String("true")},
+					Values: []string{"true"},
 				},
 			},
 			NextToken: nextToken,
 		}
 
-		instances, err := a.client.DescribeInstances(input)
+		instances, err := a.client.DescribeInstances(ctx, input)
 		if err != nil {
 			return nil, err
 		}
 
 		for _, r := range instances.Reservations {
 			for _, i := range r.Instances {
-				if *i.State.Name != ec2.InstanceStateNameTerminated {
+				if i.State.Name != types.InstanceStateNameTerminated {
 					arr := automation.ResourceResults{
 						ID:     *i.InstanceId,
 						Region: a.region,
@@ -112,13 +115,13 @@ func (a *Aws) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
-func addBlockDevice(volumeSize int) []*ec2.BlockDeviceMapping {
+func addBlockDevice(volumeSize int) []types.BlockDeviceMapping {
 	if volumeSize > 0 {
-		return []*ec2.BlockDeviceMapping{
+		return []types.BlockDeviceMapping{
 			{
 				DeviceName: aws.String("/dev/sda1"),
-				Ebs: &ec2.EbsBlockDevice{
-					VolumeSize: aws.Int64(int64(volumeSize)),
+				Ebs: &types.EbsBlockDevice{
+					VolumeSize: aws.Int32(int32(volumeSize)),
 				},
 			},
 		}
@@ -126,46 +129,46 @@ func addBlockDevice(volumeSize int) []*ec2.BlockDeviceMapping {
 	return nil
 }
 
-func (a *Aws) addNetworkInterfaces(vpc *ec2.CreateVpcOutput, args automation.ServerArgs, subnetID *string) ([]*ec2.InstanceNetworkInterfaceSpecification, error) {
-	var secGroups []*string
+func (a *Aws) addNetworkInterfaces(ctx context.Context, vpc *ec2.CreateVpcOutput, args automation.ServerArgs, subnetID *string) ([]types.InstanceNetworkInterfaceSpecification, error) {
+	var secGroups []string
 	var groupID *string
 	var err error
 	if args.MinecraftResource.GetEdition() == "bedrock" || args.MinecraftResource.GetEdition() == "nukkit" || args.MinecraftResource.GetEdition() == "powernukkit" {
-		groupID, err = a.createEC2SecurityGroup(vpc.Vpc.VpcId, "udp", args.MinecraftResource.GetPort())
+		groupID, err = a.createEC2SecurityGroup(ctx, vpc.Vpc.VpcId, "udp", args.MinecraftResource.GetPort())
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		groupID, err = a.createEC2SecurityGroup(vpc.Vpc.VpcId, "tcp", args.MinecraftResource.GetPort())
+		groupID, err = a.createEC2SecurityGroup(ctx, vpc.Vpc.VpcId, "tcp", args.MinecraftResource.GetPort())
 		if err != nil {
 			return nil, err
 		}
 		if args.MinecraftResource.HasRCON() {
-			rconID, err := a.createEC2SecurityGroup(vpc.Vpc.VpcId, "tcp", args.MinecraftResource.GetRCONPort())
+			rconID, err := a.createEC2SecurityGroup(ctx, vpc.Vpc.VpcId, "tcp", args.MinecraftResource.GetRCONPort())
 			if err != nil {
 				return nil, err
 			}
-			secGroups = append(secGroups, rconID)
+			secGroups = append(secGroups, *rconID)
 		}
 	}
-	secGroups = append(secGroups, groupID)
+	secGroups = append(secGroups, *groupID)
 	if args.MinecraftResource.HasMonitoring() {
-		promGroupID, err := a.createEC2SecurityGroup(vpc.Vpc.VpcId, "tcp", 9090)
+		promGroupID, err := a.createEC2SecurityGroup(ctx, vpc.Vpc.VpcId, "tcp", 9090)
 		if err != nil {
 			return nil, err
 		}
-		secGroups = append(secGroups, promGroupID)
+		secGroups = append(secGroups, *promGroupID)
 	}
-	sshGroupID, err := a.createEC2SecurityGroup(vpc.Vpc.VpcId, "tcp", args.MinecraftResource.GetSSHPort())
+	sshGroupID, err := a.createEC2SecurityGroup(ctx, vpc.Vpc.VpcId, "tcp", args.MinecraftResource.GetSSHPort())
 	if err != nil {
 		return nil, err
 	}
-	secGroups = append(secGroups, sshGroupID)
+	secGroups = append(secGroups, *sshGroupID)
 
-	return []*ec2.InstanceNetworkInterfaceSpecification{
+	return []types.InstanceNetworkInterfaceSpecification{
 		{
 			Description:              aws.String("the primary device eth0"),
-			DeviceIndex:              aws.Int64(0),
+			DeviceIndex:              aws.Int32(0),
 			AssociatePublicIpAddress: aws.Bool(true),
 			SubnetId:                 subnetID,
 			Groups:                   secGroups,
@@ -173,8 +176,8 @@ func (a *Aws) addNetworkInterfaces(vpc *ec2.CreateVpcOutput, args automation.Ser
 	}, nil
 }
 
-func addTags(args automation.ServerArgs) []*ec2.Tag {
-	return []*ec2.Tag{
+func addTags(args automation.ServerArgs) []types.Tag {
+	return []types.Tag{
 		{
 			Key:   aws.String("edition"),
 			Value: aws.String(args.MinecraftResource.GetEdition()),
@@ -190,10 +193,10 @@ func addTags(args automation.ServerArgs) []*ec2.Tag {
 	}
 }
 
-func addTagSpecifications(args automation.ServerArgs, resourceType string) []*ec2.TagSpecification {
-	return []*ec2.TagSpecification{
+func addTagSpecifications(args automation.ServerArgs, resourceType types.ResourceType) []types.TagSpecification {
+	return []types.TagSpecification{
 		{
-			ResourceType: aws.String(resourceType),
+			ResourceType: resourceType,
 			Tags:         addTags(args),
 		},
 	}
@@ -201,6 +204,7 @@ func addTagSpecifications(args automation.ServerArgs, resourceType string) []*ec
 
 // CreateServer TODO: https://github.com/dirien/minectl/issues/298
 func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) { //nolint: gocyclo
+	var ctx = context.TODO()
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
 
@@ -211,18 +215,18 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 
 	var imageAMI *string
 	if args.MinecraftResource.IsArm() {
-		imageAMI, err = a.lookupAMI("ubuntu-minimal/images/hvm-ssd/ubuntu-jammy-22.04*", "arm64")
+		imageAMI, err = a.lookupAMI(ctx, "ubuntu-minimal/images/hvm-ssd/ubuntu-jammy-22.04*", "arm64")
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		imageAMI, err = a.lookupAMI("ubuntu-minimal/images/hvm-ssd/ubuntu-jammy-22.04*", "x86_64")
+		imageAMI, err = a.lookupAMI(ctx, "ubuntu-minimal/images/hvm-ssd/ubuntu-jammy-22.04*", "x86_64")
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	key, err := a.client.ImportKeyPair(&ec2.ImportKeyPairInput{
+	key, err := a.client.ImportKeyPair(ctx, &ec2.ImportKeyPairInput{
 		KeyName:           aws.String(fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName())),
 		PublicKeyMaterial: []byte(*publicKey),
 	})
@@ -230,27 +234,31 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 		return nil, err
 	}
 
-	vpc, err := a.client.CreateVpc(&ec2.CreateVpcInput{
-		CidrBlock: aws.String("172.16.0.0/16"),
+	vpc, err := a.client.CreateVpc(ctx, &ec2.CreateVpcInput{
+		CidrBlock:         aws.String("172.16.0.0/16"),
+		TagSpecifications: addTagSpecifications(args, types.ResourceTypeVpc),
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	subnet, err := a.client.CreateSubnet(&ec2.CreateSubnetInput{
-		CidrBlock: aws.String("172.16.10.0/24"),
-		VpcId:     vpc.Vpc.VpcId,
+	subnet, err := a.client.CreateSubnet(ctx, &ec2.CreateSubnetInput{
+		CidrBlock:         aws.String("172.16.10.0/24"),
+		VpcId:             vpc.Vpc.VpcId,
+		TagSpecifications: addTagSpecifications(args, types.ResourceTypeSubnet),
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	internetGateway, err := a.client.CreateInternetGateway(&ec2.CreateInternetGatewayInput{})
+	internetGateway, err := a.client.CreateInternetGateway(ctx, &ec2.CreateInternetGatewayInput{
+		TagSpecifications: addTagSpecifications(args, types.ResourceTypeInternetGateway),
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = a.client.AttachInternetGateway(&ec2.AttachInternetGatewayInput{
+	_, err = a.client.AttachInternetGateway(ctx, &ec2.AttachInternetGatewayInput{
 		VpcId:             vpc.Vpc.VpcId,
 		InternetGatewayId: internetGateway.InternetGateway.InternetGatewayId,
 	})
@@ -258,13 +266,14 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 		return nil, err
 	}
 
-	routeTable, err := a.client.CreateRouteTable(&ec2.CreateRouteTableInput{
-		VpcId: vpc.Vpc.VpcId,
+	routeTable, err := a.client.CreateRouteTable(ctx, &ec2.CreateRouteTableInput{
+		VpcId:             vpc.Vpc.VpcId,
+		TagSpecifications: addTagSpecifications(args, types.ResourceTypeRouteTable),
 	})
 	if err != nil {
 		return nil, err
 	}
-	_, err = a.client.CreateRoute(&ec2.CreateRouteInput{
+	_, err = a.client.CreateRoute(ctx, &ec2.CreateRouteInput{
 		DestinationCidrBlock: aws.String("0.0.0.0/0"),
 		GatewayId:            internetGateway.InternetGateway.InternetGatewayId,
 		RouteTableId:         routeTable.RouteTable.RouteTableId,
@@ -272,7 +281,7 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 	if err != nil {
 		return nil, err
 	}
-	_, err = a.client.AssociateRouteTable(&ec2.AssociateRouteTableInput{
+	_, err = a.client.AssociateRouteTable(ctx, &ec2.AssociateRouteTableInput{
 		SubnetId:     subnet.Subnet.SubnetId,
 		RouteTableId: routeTable.RouteTable.RouteTableId,
 	})
@@ -288,31 +297,22 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 	if args.MinecraftResource.IsSpot() {
 		zap.S().Infow("Creating spot instance", "name", args.MinecraftResource.GetName())
 		spotInstance := ec2.RequestSpotInstancesInput{
-			InstanceCount: aws.Int64(1),
-			LaunchSpecification: &ec2.RequestSpotLaunchSpecification{
+			InstanceCount: aws.Int32(1),
+			LaunchSpecification: &types.RequestSpotLaunchSpecification{
 				ImageId:             imageAMI,
 				KeyName:             key.KeyName,
-				InstanceType:        aws.String(args.MinecraftResource.GetSize()),
+				InstanceType:        types.InstanceType(args.MinecraftResource.GetSize()),
 				BlockDeviceMappings: addBlockDevice(args.MinecraftResource.GetVolumeSize()),
 				UserData:            aws.String(base64.StdEncoding.EncodeToString([]byte(userData))),
 			},
-			TagSpecifications: addTagSpecifications(args, "spot-instances-request"),
+			TagSpecifications: addTagSpecifications(args, types.ResourceTypeSpotInstancesRequest),
 		}
-		spotInstance.LaunchSpecification.NetworkInterfaces, err = a.addNetworkInterfaces(vpc, args, subnet.Subnet.SubnetId)
+		spotInstance.LaunchSpecification.NetworkInterfaces, err = a.addNetworkInterfaces(ctx, vpc, args, subnet.Subnet.SubnetId)
 		if err != nil {
-			if aerr, ok := err.(awserr.Error); ok {
-				return nil, aerr
-			}
 			return nil, err
 		}
 
-		result, err := a.client.RequestSpotInstances(&spotInstance)
-		if err != nil {
-			return nil, err
-		}
-		err = a.client.WaitUntilSpotInstanceRequestFulfilled(&ec2.DescribeSpotInstanceRequestsInput{
-			SpotInstanceRequestIds: []*string{result.SpotInstanceRequests[0].SpotInstanceRequestId},
-		})
+		result, err := a.client.RequestSpotInstances(ctx, &spotInstance)
 		if err != nil {
 			return nil, err
 		}
@@ -322,28 +322,28 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 			case <-ctx.Done():
 				return nil, errors.New("timed out while creating the aws instance")
 			case <-time.After(10 * time.Second):
-				spotInstanceRequests, err := a.client.DescribeSpotInstanceRequests(&ec2.DescribeSpotInstanceRequestsInput{
-					SpotInstanceRequestIds: aws.StringSlice([]string{*result.SpotInstanceRequests[0].SpotInstanceRequestId}),
+				spotInstanceRequests, err := a.client.DescribeSpotInstanceRequests(ctx, &ec2.DescribeSpotInstanceRequestsInput{
+					SpotInstanceRequestIds: []string{*result.SpotInstanceRequests[0].SpotInstanceRequestId},
 				})
 				if err != nil {
 					return nil, err
 				}
-				instanceStatus, err := a.client.DescribeInstanceStatus(&ec2.DescribeInstanceStatusInput{
-					InstanceIds: aws.StringSlice([]string{*spotInstanceRequests.SpotInstanceRequests[0].InstanceId}),
+				instanceStatus, err := a.client.DescribeInstanceStatus(ctx, &ec2.DescribeInstanceStatusInput{
+					InstanceIds: []string{*spotInstanceRequests.SpotInstanceRequests[0].InstanceId},
 				})
 				if err != nil {
 					return nil, err
 				}
-				_, err = a.client.CreateTags(&ec2.CreateTagsInput{
-					Resources: aws.StringSlice([]string{*spotInstanceRequests.SpotInstanceRequests[0].InstanceId}),
+				_, err = a.client.CreateTags(ctx, &ec2.CreateTagsInput{
+					Resources: []string{*spotInstanceRequests.SpotInstanceRequests[0].InstanceId},
 					Tags:      addTags(args),
 				})
 				if err != nil {
 					return nil, err
 				}
-				if *instanceStatus.InstanceStatuses[0].InstanceState.Name == "running" {
-					i, err := a.client.DescribeInstances(&ec2.DescribeInstancesInput{
-						InstanceIds: aws.StringSlice([]string{*spotInstanceRequests.SpotInstanceRequests[0].InstanceId}),
+				if instanceStatus.InstanceStatuses[0].InstanceState.Name == "running" {
+					i, err := a.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
+						InstanceIds: []string{*spotInstanceRequests.SpotInstanceRequests[0].InstanceId},
 					})
 					if err != nil {
 						return nil, err
@@ -361,7 +361,7 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 					return &automation.ResourceResults{
 						ID:       fmt.Sprintf("%s#%s", *i.Reservations[0].Instances[0].InstanceId, *result.SpotInstanceRequests[0].SpotInstanceRequestId),
 						Name:     instanceName,
-						Region:   *a.client.Config.Region,
+						Region:   a.region,
 						PublicIP: *i.Reservations[0].Instances[0].PublicIpAddress,
 						Tags:     strings.Join(tags, ","),
 					}, nil
@@ -373,27 +373,21 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 		instanceInput := &ec2.RunInstancesInput{
 			ImageId:             imageAMI,
 			KeyName:             key.KeyName,
-			InstanceType:        aws.String(args.MinecraftResource.GetSize()),
-			MinCount:            aws.Int64(1),
-			MaxCount:            aws.Int64(1),
+			InstanceType:        types.InstanceType(args.MinecraftResource.GetSize()),
+			MinCount:            aws.Int32(1),
+			MaxCount:            aws.Int32(1),
 			UserData:            aws.String(base64.StdEncoding.EncodeToString([]byte(userData))),
-			TagSpecifications:   addTagSpecifications(args, "instance"),
+			TagSpecifications:   addTagSpecifications(args, types.ResourceTypeInstance),
 			BlockDeviceMappings: addBlockDevice(args.MinecraftResource.GetVolumeSize()),
 		}
 
-		instanceInput.NetworkInterfaces, err = a.addNetworkInterfaces(vpc, args, subnet.Subnet.SubnetId)
+		instanceInput.NetworkInterfaces, err = a.addNetworkInterfaces(ctx, vpc, args, subnet.Subnet.SubnetId)
 		if err != nil {
-			if aerr, ok := err.(awserr.Error); ok {
-				return nil, aerr
-			}
 			return nil, err
 		}
 
-		result, err := a.client.RunInstances(instanceInput)
+		result, err := a.client.RunInstances(ctx, instanceInput)
 		if err != nil {
-			if aerr, ok := err.(awserr.Error); ok {
-				return nil, aerr
-			}
 			return nil, err
 		}
 
@@ -402,16 +396,16 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 			case <-ctx.Done():
 				return nil, errors.New("timed out while creating the aws instance")
 			case <-time.After(10 * time.Second):
-				describeInstanceStatus, err := a.client.DescribeInstanceStatus(&ec2.DescribeInstanceStatusInput{
-					InstanceIds: aws.StringSlice([]string{*result.Instances[0].InstanceId}),
+				describeInstanceStatus, err := a.client.DescribeInstanceStatus(ctx, &ec2.DescribeInstanceStatusInput{
+					InstanceIds: []string{*result.Instances[0].InstanceId},
 				})
 				if err != nil {
 					return nil, err
 				}
 				if len(describeInstanceStatus.InstanceStatuses) > 0 {
-					if *describeInstanceStatus.InstanceStatuses[0].InstanceState.Name == "running" {
-						i, err := a.client.DescribeInstances(&ec2.DescribeInstancesInput{
-							InstanceIds: aws.StringSlice([]string{*result.Instances[0].InstanceId}),
+					if describeInstanceStatus.InstanceStatuses[0].InstanceState.Name == "running" {
+						i, err := a.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
+							InstanceIds: []string{*result.Instances[0].InstanceId},
 						})
 						if err != nil {
 							return nil, err
@@ -429,7 +423,7 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 						return &automation.ResourceResults{
 							ID:       *i.Reservations[0].Instances[0].InstanceId,
 							Name:     instanceName,
-							Region:   *a.client.Config.Region,
+							Region:   a.region,
 							PublicIP: *i.Reservations[0].Instances[0].PublicIpAddress,
 							Tags:     strings.Join(tags, ","),
 						}, nil
@@ -441,9 +435,10 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 }
 
 func (a *Aws) UpdateServer(id string, args automation.ServerArgs) error {
+	ctx := context.TODO()
 	ids, _, _ := strings.Cut(id, "#")
-	i, err := a.client.DescribeInstances(&ec2.DescribeInstancesInput{
-		InstanceIds: aws.StringSlice([]string{ids}),
+	i, err := a.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
+		InstanceIds: []string{ids},
 	})
 	if err != nil {
 		return err
@@ -459,30 +454,19 @@ func (a *Aws) UpdateServer(id string, args automation.ServerArgs) error {
 }
 
 func (a *Aws) DeleteServer(id string, args automation.ServerArgs) error {
-	keys, err := a.client.DescribeKeyPairs(&ec2.DescribeKeyPairsInput{
-		KeyNames: aws.StringSlice([]string{fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName())}),
-	})
-	if err != nil {
-		return err
-	}
+	ctx := context.TODO()
 
-	_, err = a.client.DeleteKeyPair(&ec2.DeleteKeyPairInput{
-		KeyName: aws.String(*keys.KeyPairs[0].KeyName),
-	})
-	if err != nil {
-		return err
-	}
 	ids, spotID, _ := strings.Cut(id, "#")
 	if args.MinecraftResource.IsSpot() {
-		_, err := a.client.CancelSpotInstanceRequests(&ec2.CancelSpotInstanceRequestsInput{
-			SpotInstanceRequestIds: aws.StringSlice([]string{spotID}),
+		_, err := a.client.CancelSpotInstanceRequests(ctx, &ec2.CancelSpotInstanceRequestsInput{
+			SpotInstanceRequestIds: []string{spotID},
 		})
 		if err != nil {
 			return err
 		}
 	}
-	i, err := a.client.DescribeInstances(&ec2.DescribeInstancesInput{
-		InstanceIds: aws.StringSlice([]string{ids}),
+	i, err := a.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
+		InstanceIds: []string{ids},
 	})
 	if err != nil {
 		return err
@@ -490,24 +474,36 @@ func (a *Aws) DeleteServer(id string, args automation.ServerArgs) error {
 	// we have only on instance
 	instance := i.Reservations[0].Instances[0]
 
-	_, err = a.client.TerminateInstances(&ec2.TerminateInstancesInput{
-		InstanceIds: aws.StringSlice([]string{ids}),
+	_, err = a.client.TerminateInstances(ctx, &ec2.TerminateInstancesInput{
+		InstanceIds: []string{ids},
 	})
 	if err != nil {
 		return err
 	}
 
-	err = a.client.WaitUntilInstanceTerminated(&ec2.DescribeInstancesInput{
-		InstanceIds: aws.StringSlice([]string{ids}),
-	})
-	if err != nil {
-		return err
+	stillDeleting := true
+
+	for stillDeleting {
+		status, err := a.client.TerminateInstances(ctx, &ec2.TerminateInstancesInput{
+			InstanceIds: []string{ids},
+		})
+		if err != nil {
+			return err
+		}
+
+		if *status.TerminatingInstances[0].CurrentState.Code == 48 {
+			stillDeleting = false
+			time.Sleep(15 * time.Second)
+		} else {
+			time.Sleep(2 * time.Second)
+		}
+
 	}
 
 	groups := instance.SecurityGroups
 
 	for _, group := range groups {
-		_, err := a.client.DeleteSecurityGroup(&ec2.DeleteSecurityGroupInput{
+		_, err = a.client.DeleteSecurityGroup(ctx, &ec2.DeleteSecurityGroupInput{
 			GroupId: group.GroupId,
 		})
 		if err != nil {
@@ -517,18 +513,18 @@ func (a *Aws) DeleteServer(id string, args automation.ServerArgs) error {
 
 	vpcID := instance.VpcId
 	subnetID := instance.SubnetId
-	_, err = a.client.DeleteSubnet(&ec2.DeleteSubnetInput{
+	_, err = a.client.DeleteSubnet(ctx, &ec2.DeleteSubnetInput{
 		SubnetId: subnetID,
 	})
 	if err != nil {
 		return err
 	}
 
-	internetGateways, err := a.client.DescribeInternetGateways(&ec2.DescribeInternetGatewaysInput{
-		Filters: []*ec2.Filter{
+	internetGateways, err := a.client.DescribeInternetGateways(ctx, &ec2.DescribeInternetGatewaysInput{
+		Filters: []types.Filter{
 			{
 				Name:   aws.String("attachment.vpc-id"),
-				Values: []*string{vpcID},
+				Values: []string{*vpcID},
 			},
 		},
 	})
@@ -537,14 +533,14 @@ func (a *Aws) DeleteServer(id string, args automation.ServerArgs) error {
 	}
 
 	for _, internetGateway := range internetGateways.InternetGateways {
-		_, err := a.client.DetachInternetGateway(&ec2.DetachInternetGatewayInput{
+		_, err := a.client.DetachInternetGateway(ctx, &ec2.DetachInternetGatewayInput{
 			InternetGatewayId: internetGateway.InternetGatewayId,
 			VpcId:             vpcID,
 		})
 		if err != nil {
 			return err
 		}
-		_, err = a.client.DeleteInternetGateway(&ec2.DeleteInternetGatewayInput{
+		_, err = a.client.DeleteInternetGateway(ctx, &ec2.DeleteInternetGatewayInput{
 			InternetGatewayId: internetGateway.InternetGatewayId,
 		})
 		if err != nil {
@@ -552,20 +548,21 @@ func (a *Aws) DeleteServer(id string, args automation.ServerArgs) error {
 		}
 	}
 
-	routeTables, err := a.client.DescribeRouteTables(&ec2.DescribeRouteTablesInput{
-		Filters: []*ec2.Filter{
+	routeTables, err := a.client.DescribeRouteTables(ctx, &ec2.DescribeRouteTablesInput{
+		Filters: []types.Filter{
 			{
 				Name:   aws.String("vpc-id"),
-				Values: []*string{vpcID},
+				Values: []string{*vpcID},
 			},
 		},
 	})
 	if err != nil {
 		return err
 	}
+
 	for _, routeTable := range routeTables.RouteTables {
-		if routeTable.Associations == nil {
-			_, err := a.client.DeleteRouteTable(&ec2.DeleteRouteTableInput{
+		if len(routeTable.Associations) == 0 {
+			_, err := a.client.DeleteRouteTable(ctx, &ec2.DeleteRouteTableInput{
 				RouteTableId: routeTable.RouteTableId,
 			})
 			if err != nil {
@@ -573,8 +570,22 @@ func (a *Aws) DeleteServer(id string, args automation.ServerArgs) error {
 			}
 		}
 	}
-	_, err = a.client.DeleteVpc(&ec2.DeleteVpcInput{
+
+	_, err = a.client.DeleteVpc(ctx, &ec2.DeleteVpcInput{
 		VpcId: vpcID,
+	})
+	if err != nil {
+		return err
+	}
+	keys, err := a.client.DescribeKeyPairs(ctx, &ec2.DescribeKeyPairsInput{
+		KeyNames: []string{fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName())},
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = a.client.DeleteKeyPair(ctx, &ec2.DeleteKeyPairInput{
+		KeyName: aws.String(*keys.KeyPairs[0].KeyName),
 	})
 	if err != nil {
 		return err
@@ -583,9 +594,10 @@ func (a *Aws) DeleteServer(id string, args automation.ServerArgs) error {
 }
 
 func (a *Aws) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
+	ctx := context.TODO()
 	ids, _, _ := strings.Cut(id, "#")
-	i, err := a.client.DescribeInstances(&ec2.DescribeInstancesInput{
-		InstanceIds: aws.StringSlice([]string{ids}),
+	i, err := a.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
+		InstanceIds: []string{ids},
 	})
 	if err != nil {
 		return err
@@ -607,9 +619,10 @@ func (a *Aws) UploadPlugin(id string, args automation.ServerArgs, plugin, destin
 }
 
 func (a *Aws) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
+	ctx := context.TODO()
 	ids, _, _ := strings.Cut(id, "#")
-	i, err := a.client.DescribeInstances(&ec2.DescribeInstancesInput{
-		InstanceIds: aws.StringSlice([]string{ids}),
+	i, err := a.client.DescribeInstances(ctx, &ec2.DescribeInstancesInput{
+		InstanceIds: []string{ids},
 	})
 	if err != nil {
 		return nil, err
@@ -628,29 +641,40 @@ func (a *Aws) GetServer(id string, _ automation.ServerArgs) (*automation.Resourc
 	return &automation.ResourceResults{
 		ID:       *i.Reservations[0].Instances[0].InstanceId,
 		Name:     instanceName,
-		Region:   *a.client.Config.Region,
+		Region:   a.region,
 		PublicIP: *i.Reservations[0].Instances[0].PublicIpAddress,
 		Tags:     strings.Join(tags, ","),
 	}, err
 }
 
-func (a *Aws) createEC2SecurityGroup(vpcID *string, protocol string, controlPort int) (*string, error) {
+func (a *Aws) createEC2SecurityGroup(ctx context.Context, vpcID *string, protocol string, controlPort int) (*string, error) {
 	groupName := "minecraft-" + uuid.New().String()
 	input := &ec2.CreateSecurityGroupInput{
 		Description: aws.String("minecraft security group"),
 		GroupName:   aws.String(groupName),
+		TagSpecifications: []types.TagSpecification{
+			{
+				ResourceType: types.ResourceTypeSecurityGroup,
+				Tags: []types.Tag{
+					{
+						Key:   aws.String("Name"),
+						Value: aws.String(groupName),
+					},
+				},
+			},
+		},
 	}
 
 	if vpcID != nil {
 		input.VpcId = vpcID
 	}
 
-	group, err := a.client.CreateSecurityGroup(input)
+	group, err := a.client.CreateSecurityGroup(ctx, input)
 	if err != nil {
 		return nil, err
 	}
 
-	err = a.createEC2SecurityGroupRule(*group.GroupId, protocol, controlPort, controlPort)
+	err = a.createEC2SecurityGroupRule(ctx, *group.GroupId, protocol, controlPort, controlPort)
 	if err != nil {
 		return group.GroupId, err
 	}
@@ -658,12 +682,12 @@ func (a *Aws) createEC2SecurityGroup(vpcID *string, protocol string, controlPort
 	return group.GroupId, nil
 }
 
-func (a *Aws) createEC2SecurityGroupRule(groupID, protocol string, fromPort, toPort int) error {
-	_, err := a.client.AuthorizeSecurityGroupIngress(&ec2.AuthorizeSecurityGroupIngressInput{
+func (a *Aws) createEC2SecurityGroupRule(ctx context.Context, groupID, protocol string, fromPort, toPort int) error {
+	_, err := a.client.AuthorizeSecurityGroupIngress(ctx, &ec2.AuthorizeSecurityGroupIngressInput{
 		CidrIp:     aws.String("0.0.0.0/0"),
-		FromPort:   aws.Int64(int64(fromPort)),
+		FromPort:   aws.Int32(int32(fromPort)),
 		IpProtocol: aws.String(protocol),
-		ToPort:     aws.Int64(int64(toPort)),
+		ToPort:     aws.Int32(int32(toPort)),
 		GroupId:    aws.String(groupID),
 	})
 	if err != nil {
@@ -674,25 +698,25 @@ func (a *Aws) createEC2SecurityGroupRule(groupID, protocol string, fromPort, toP
 }
 
 // lookupAMI gets the AMI ID that the exit node will use
-func (a *Aws) lookupAMI(name, architecture string) (*string, error) {
-	images, err := a.client.DescribeImages(&ec2.DescribeImagesInput{
-		Filters: []*ec2.Filter{
+func (a *Aws) lookupAMI(ctx context.Context, name, architecture string) (*string, error) {
+	images, err := a.client.DescribeImages(ctx, &ec2.DescribeImagesInput{
+		Filters: []types.Filter{
 			{
 				Name: aws.String("name"),
-				Values: []*string{
-					aws.String(name),
+				Values: []string{
+					name,
 				},
 			},
 			{
 				Name: aws.String("architecture"),
-				Values: []*string{
-					aws.String(architecture),
+				Values: []string{
+					architecture,
 				},
 			},
 			{
 				Name: aws.String("owner-id"),
-				Values: []*string{
-					aws.String("099720109477"),
+				Values: []string{
+					"099720109477",
 				},
 			},
 		},
