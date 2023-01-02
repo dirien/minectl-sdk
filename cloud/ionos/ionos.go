@@ -14,7 +14,7 @@ import (
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
-	ionoscloud "github.com/ionos-cloud/sdk-go/v5"
+	ionoscloud "github.com/ionos-cloud/sdk-go/v6"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
@@ -41,7 +41,7 @@ func NewIONOS(username, password, token string) (*IONOS, error) {
 func (i *IONOS) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	ctx := context.Background()
 
-	datacenters, _, err := i.client.DataCenterApi.DatacentersGet(ctx).Execute()
+	datacenters, _, err := i.client.DataCentersApi.DatacentersGet(ctx).Execute()
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (i *IONOS) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 		},
 	}
 
-	createdDatacenter, _, err := i.client.DataCenterApi.DatacentersPost(ctx).Datacenter(datacenter).Execute()
+	createdDatacenter, _, err := i.client.DataCentersApi.DatacentersPost(ctx).Datacenter(datacenter).Execute()
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (i *IONOS) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 			Public: ionoscloud.PtrBool(true),
 		},
 	}
-	lan, _, err := i.client.LanApi.DatacentersLansPost(ctx, *createdDatacenter.GetId()).Lan(lanRequest).Execute()
+	lan, _, err := i.client.LANsApi.DatacentersLansPost(ctx, *createdDatacenter.GetId()).Lan(lanRequest).Execute()
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (i *IONOS) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 		return nil, err
 	}
 
-	images, _, err := i.client.ImageApi.ImagesGet(ctx).Execute()
+	images, _, err := i.client.ImagesApi.ImagesGet(ctx).Execute()
 	if err != nil {
 		return nil, err
 	}
@@ -136,13 +136,13 @@ func (i *IONOS) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 			},
 		},
 	}
-	server, _, err := i.client.ServerApi.DatacentersServersPost(ctx, *createdDatacenter.GetId()).Server(request).Execute()
+	server, _, err := i.client.ServersApi.DatacentersServersPost(ctx, *createdDatacenter.GetId()).Server(request).Execute()
 	if err != nil {
 		return nil, err
 	}
 	stillCreating := true
 	for stillCreating {
-		server, resp, err := i.client.ServerApi.DatacentersServersFindById(ctx, *createdDatacenter.GetId(), *server.Id).Execute()
+		server, resp, err := i.client.ServersApi.DatacentersServersFindById(ctx, *createdDatacenter.GetId(), *server.Id).Execute()
 		if err != nil {
 			if resp.StatusCode != 404 {
 				return nil, err
@@ -156,7 +156,7 @@ func (i *IONOS) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 			}
 		}
 	}
-	server, _, err = i.client.ServerApi.DatacentersServersFindById(ctx, *createdDatacenter.GetId(), *server.Id).Execute()
+	server, _, err = i.client.ServersApi.DatacentersServersFindById(ctx, *createdDatacenter.GetId(), *server.Id).Execute()
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +172,7 @@ func (i *IONOS) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 
 func (i *IONOS) DeleteServer(id string, _ automation.ServerArgs) error {
 	ctx := context.Background()
-	_, _, err := i.client.DataCenterApi.DatacentersDelete(ctx, id).Execute()
+	_, err := i.client.DataCentersApi.DatacentersDelete(ctx, id).Execute()
 	if err != nil {
 		return err
 	}
@@ -182,18 +182,18 @@ func (i *IONOS) DeleteServer(id string, _ automation.ServerArgs) error {
 func (i *IONOS) ListServer() ([]automation.ResourceResults, error) {
 	ctx := context.Background()
 	var result []automation.ResourceResults
-	datacenters, _, err := i.client.DataCenterApi.DatacentersGet(ctx).Execute()
+	datacenters, _, err := i.client.DataCentersApi.DatacentersGet(ctx).Execute()
 	if err != nil {
 		return nil, err
 	}
 	for _, datacenter := range *datacenters.Items {
 		if *datacenter.GetProperties().GetDescription() == common.InstanceTag {
-			servers, _, err := i.client.ServerApi.DatacentersServersGet(ctx, *datacenter.GetId()).Execute()
+			servers, _, err := i.client.ServersApi.DatacentersServersGet(ctx, *datacenter.GetId()).Execute()
 			if err != nil {
 				return nil, err
 			}
 			for _, serverItem := range *servers.Items {
-				server, _, err := i.client.ServerApi.DatacentersServersFindById(ctx, *datacenter.GetId(), *serverItem.Id).Execute()
+				server, _, err := i.client.ServersApi.DatacentersServersFindById(ctx, *datacenter.GetId(), *serverItem.Id).Execute()
 				if err != nil {
 					return nil, err
 				}
@@ -247,17 +247,17 @@ func (i *IONOS) UploadPlugin(id string, args automation.ServerArgs, plugin, dest
 
 func (i *IONOS) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
 	ctx := context.Background()
-	datacenter, _, err := i.client.DataCenterApi.DatacentersFindById(ctx, id).Execute()
+	datacenter, _, err := i.client.DataCentersApi.DatacentersFindById(ctx, id).Execute()
 	if err != nil {
 		return nil, err
 	}
-	servers, _, err := i.client.ServerApi.DatacentersServersGet(ctx, *datacenter.GetId()).Execute()
+	servers, _, err := i.client.ServersApi.DatacentersServersGet(ctx, *datacenter.GetId()).Execute()
 	if err != nil {
 		return nil, err
 	}
 	for _, serverItem := range *servers.Items {
 		zap.S().Infow("Ionos found server", "server", serverItem)
-		server, _, err := i.client.ServerApi.DatacentersServersFindById(ctx, *datacenter.GetId(), *serverItem.Id).Execute()
+		server, _, err := i.client.ServersApi.DatacentersServersFindById(ctx, *datacenter.GetId(), *serverItem.Id).Execute()
 		if err != nil {
 			return nil, err
 		}
