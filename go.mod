@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.17.3
 	github.com/aws/aws-sdk-go-v2/config v1.18.7
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.77.0
-	github.com/civo/civogo v0.3.21
+	github.com/civo/civogo v0.3.22
 	github.com/digitalocean/godo v1.93.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.88.0
@@ -20,7 +20,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gophercloud/gophercloud v1.1.1
 	github.com/hashicorp/go-cleanhttp v0.5.2
-	github.com/hashicorp/go-retryablehttp v0.7.1
+	github.com/hashicorp/go-retryablehttp v0.7.2
 	github.com/hetznercloud/hcloud-go v1.39.0
 	github.com/ionos-cloud/sdk-go/v6 v6.1.3
 	github.com/linode/linodego v1.10.0
