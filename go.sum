@@ -85,8 +85,8 @@ github.com/decred/dcrd/crypto/blake256 v1.0.0/go.mod h1:sQl2p6Y26YV+ZOcSTP6thNdn
 github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.0-20210816181553-5444fa50b93d/go.mod h1:tmAIfUFEirG/Y8jhZ9M+h36obRZAk/1fcSpXwAVlfqE=
 github.com/deepmap/oapi-codegen v1.9.1 h1:yHmEnA7jSTUMQgV+uN02WpZtwHnz2CBW3mZRIxr1vtI=
 github.com/deepmap/oapi-codegen v1.9.1/go.mod h1:PLqNAhdedP8ttRpBBkzLKU3bp+Fpy+tTgeAMlztR2cw=
-github.com/digitalocean/godo v1.94.0 h1:5beWdRmC1DvY1g9yhxlio9GI+cRBqYlESgs0siBXbD0=
-github.com/digitalocean/godo v1.94.0/go.mod h1:NRpFznZFvhHjBoqZAaOD3khVzsJ3EibzKqFL4R60dmA=
+github.com/digitalocean/godo v1.95.0 h1:S48/byPKui7RHZc1wYEPfRvkcEvToADNb5I3guu95xg=
+github.com/digitalocean/godo v1.95.0/go.mod h1:NRpFznZFvhHjBoqZAaOD3khVzsJ3EibzKqFL4R60dmA=
 github.com/dirien/ovh-go-sdk v0.2.0 h1:hIL39yxXnUNEUw1gn3g2cA9QKj2cHdbbowAyq8tHug4=
 github.com/dirien/ovh-go-sdk v0.2.0/go.mod h1:kz6dmFoAym8NbdVTdGRzQuTGfRNoMrSuevxvxxBPVjA=
 github.com/dnaeon/go-vcr v1.0.1/go.mod h1:aBB1+wY4s93YsC3HHjMBMrwTj2R9FHDzUr9KyGc8n1E=
@@ -276,8 +276,8 @@ github.com/onsi/gomega v1.10.1/go.mod h1:iN09h71vgCQne3DLsj+A5owkum+a2tYe+TOCB1y
 github.com/onsi/gomega v1.17.0/go.mod h1:HnhC7FXeEQY45zxNK3PPoIUhzk/80Xly9PcubAlGdZY=
 github.com/onsi/gomega v1.19.0 h1:4ieX6qQjPP/BfC3mpsAtIGGlxTWPeA3Inl/7DtXw1tw=
 github.com/onsi/gomega v1.19.0/go.mod h1:LY+I3pBVzYsTBU1AnDwOSxaYi9WoWiqgwooUqq9yPro=
-github.com/oracle/oci-go-sdk/v65 v65.28.1 h1:5GzesfBWQTCbHGEaiEyqDEkGVQDow7qB4mjK4s4Ikk0=
-github.com/oracle/oci-go-sdk/v65 v65.28.1/go.mod h1:oyMrMa1vOzzKTmPN+kqrTR9y9kPA2tU1igN3NUSNTIE=
+github.com/oracle/oci-go-sdk/v65 v65.28.2 h1:+ivbXxEtxjQlag8Iunpe9muS/dJ634M3OplMcohD/tY=
+github.com/oracle/oci-go-sdk/v65 v65.28.2/go.mod h1:oyMrMa1vOzzKTmPN+kqrTR9y9kPA2tU1igN3NUSNTIE=
 github.com/ovh/go-ovh v1.3.0 h1:mvZaddk4E4kLcXhzb+cxBsMPYp2pHqiQpWYkInsuZPQ=
 github.com/ovh/go-ovh v1.3.0/go.mod h1:AxitLZ5HBRPyUd+Zl60Ajaag+rNTdVXWIkzfrVuTXWA=
 github.com/packethost/packngo v0.29.0 h1:gRIhciVZQ/zLNrIdIdbOUyB/Tw5IgoaXyhP4bvE+D2s=

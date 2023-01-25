@@ -13,7 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.18.9
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.80.1
 	github.com/civo/civogo v0.3.23
-	github.com/digitalocean/godo v1.94.0
+	github.com/digitalocean/godo v1.95.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.88.0
 	github.com/fatih/color v1.14.1
@@ -25,7 +25,7 @@ require (
 	github.com/ionos-cloud/sdk-go/v6 v6.1.3
 	github.com/linode/linodego v1.12.0
 	github.com/melbahja/goph v1.3.0
-	github.com/oracle/oci-go-sdk/v65 v65.28.1
+	github.com/oracle/oci-go-sdk/v65 v65.28.2
 	github.com/packethost/packngo v0.29.0
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.12
