@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.3.0
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.2.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.2.1
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v4 v4.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v2 v2.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
@@ -22,7 +22,7 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.2
 	github.com/hetznercloud/hcloud-go v1.39.0
-	github.com/ionos-cloud/sdk-go/v6 v6.1.3
+	github.com/ionos-cloud/sdk-go/v6 v6.1.4
 	github.com/linode/linodego v1.12.0
 	github.com/melbahja/goph v1.3.0
 	github.com/oracle/oci-go-sdk/v65 v65.28.2
@@ -42,7 +42,7 @@ require (
 	cloud.google.com/go/compute v1.14.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.1.2 // indirect
-	github.com/AzureAD/microsoft-authentication-library-for-go v0.7.0 // indirect
+	github.com/AzureAD/microsoft-authentication-library-for-go v0.8.1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.10 // indirect
