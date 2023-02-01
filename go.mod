@@ -10,10 +10,10 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.17.3
-	github.com/aws/aws-sdk-go-v2/config v1.18.10
+	github.com/aws/aws-sdk-go-v2/config v1.18.11
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.83.0
-	github.com/civo/civogo v0.3.23
-	github.com/digitalocean/godo v1.95.0
+	github.com/civo/civogo v0.3.24
+	github.com/digitalocean/godo v1.96.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.88.0
 	github.com/fatih/color v1.14.1
@@ -45,7 +45,7 @@ require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v0.8.1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.13.10 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.13.11 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.21 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.27 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.21 // indirect
