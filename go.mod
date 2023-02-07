@@ -25,10 +25,10 @@ require (
 	github.com/ionos-cloud/sdk-go/v6 v6.1.4
 	github.com/linode/linodego v1.13.0
 	github.com/melbahja/goph v1.3.0
-	github.com/oracle/oci-go-sdk/v65 v65.28.3
+	github.com/oracle/oci-go-sdk/v65 v65.29.0
 	github.com/packethost/packngo v0.29.0
 	github.com/pkg/errors v0.9.1
-	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.12
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.13
 	github.com/sethvargo/go-password v0.2.0
 	github.com/stretchr/testify v1.8.1
 	github.com/vultr/govultr/v2 v2.17.2
