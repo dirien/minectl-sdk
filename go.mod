@@ -11,9 +11,9 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.17.4
 	github.com/aws/aws-sdk-go-v2/config v1.18.12
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.84.1
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.85.0
 	github.com/civo/civogo v0.3.24
-	github.com/digitalocean/godo v1.96.0
+	github.com/digitalocean/godo v1.97.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.88.0
 	github.com/fatih/color v1.14.1
@@ -23,7 +23,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.2
 	github.com/hetznercloud/hcloud-go v1.39.0
 	github.com/ionos-cloud/sdk-go/v6 v6.1.4
-	github.com/linode/linodego v1.14.0
+	github.com/linode/linodego v1.14.1
 	github.com/melbahja/goph v1.3.0
 	github.com/oracle/oci-go-sdk/v65 v65.29.0
 	github.com/packethost/packngo v0.29.0
