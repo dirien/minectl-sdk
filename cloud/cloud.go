@@ -15,7 +15,7 @@ var cloudProvider = map[string]string{
 	"civo":      "Civo",
 	"scaleway":  "Scaleway",
 	"hetzner":   "Hetzner",
-	"linode":    "Linode",
+	"akamai":    "Akamai Connected Cloud",
 	"ovh":       "OVHcloud",
 	"equinix":   "Equinix Metal",
 	"gce":       "Google Compute Engine",

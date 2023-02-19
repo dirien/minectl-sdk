@@ -9,6 +9,10 @@ SDK for every minectl product
 
 ## Breaking changes
 
+### v0.8.0
+
+- Rename `Linode` to `Akamai Connected Cloud` and all related files. See this [blog post](https://www.linode.com/blog/linode/a-bold-new-approach-to-the-cloud/) for more information.
+
 ### v0.4.0
 
 - Rename of the field `keyFolder` to `publickeyfile` in the [SSH Struct](/model/model.go)

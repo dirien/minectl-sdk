@@ -57,7 +57,7 @@ func NewAWS(region string) (*Aws, error) {
 }
 
 func (a *Aws) ListServer() ([]automation.ResourceResults, error) {
-	var ctx = context.TODO()
+	ctx := context.TODO()
 	var result []automation.ResourceResults
 	var nextToken *string
 
@@ -204,7 +204,7 @@ func addTagSpecifications(args automation.ServerArgs, resourceType types.Resourc
 
 // CreateServer TODO: https://github.com/dirien/minectl/issues/298
 func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) { //nolint: gocyclo
-	var ctx = context.TODO()
+	ctx := context.TODO()
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
 

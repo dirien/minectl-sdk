@@ -1,4 +1,4 @@
-package linode
+package akamai
 
 import (
 	"context"
@@ -19,12 +19,12 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type Linode struct {
+type Akamai struct {
 	client linodego.Client
 	tmpl   *minctlTemplate.Template
 }
 
-func NewLinode(apiToken string) (*Linode, error) {
+func NewAkamai(apiToken string) (*Akamai, error) {
 	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: apiToken})
 
 	oauth2Client := &http.Client{
@@ -38,14 +38,14 @@ func NewLinode(apiToken string) (*Linode, error) {
 	if err != nil {
 		return nil, err
 	}
-	linode := &Linode{
+	linode := &Akamai{
 		client: linodeClient,
 		tmpl:   tmpl,
 	}
 	return linode, nil
 }
 
-func (l *Linode) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
+func (l *Akamai) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	ubuntuImage := "linode/ubuntu22.04"
 	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
@@ -127,7 +127,7 @@ func (l *Linode) CreateServer(args automation.ServerArgs) (*automation.ResourceR
 	}, err
 }
 
-func (l *Linode) DeleteServer(id string, args automation.ServerArgs) error {
+func (l *Akamai) DeleteServer(id string, args automation.ServerArgs) error {
 	keys, err := l.client.ListSSHKeys(context.Background(), nil)
 	if err != nil {
 		return err
@@ -182,7 +182,7 @@ func (l *Linode) DeleteServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
-func (l *Linode) ListServer() ([]automation.ResourceResults, error) {
+func (l *Akamai) ListServer() ([]automation.ResourceResults, error) {
 	servers, err := l.client.ListInstances(context.Background(), linodego.NewListOptions(0, "{\"tags\":\"minectl\"}"))
 	if err != nil {
 		return nil, err
@@ -200,7 +200,7 @@ func (l *Linode) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
-func (l *Linode) UpdateServer(id string, args automation.ServerArgs) error {
+func (l *Akamai) UpdateServer(id string, args automation.ServerArgs) error {
 	intID, _ := strconv.Atoi(id)
 	instance, err := l.client.GetInstance(context.Background(), intID)
 	if err != nil {
@@ -215,7 +215,7 @@ func (l *Linode) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
-func (l *Linode) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
+func (l *Akamai) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	intID, _ := strconv.Atoi(id)
 	instance, err := l.client.GetInstance(context.Background(), intID)
 	if err != nil {
@@ -234,7 +234,7 @@ func (l *Linode) UploadPlugin(id string, args automation.ServerArgs, plugin, des
 	return nil
 }
 
-func (l *Linode) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
+func (l *Akamai) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
 	intID, _ := strconv.Atoi(id)
 	instance, err := l.client.GetInstance(context.Background(), intID)
 	if err != nil {
