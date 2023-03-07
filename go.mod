@@ -21,7 +21,7 @@ require (
 	github.com/gophercloud/gophercloud v1.2.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.2
-	github.com/hetznercloud/hcloud-go v1.40.0
+	github.com/hetznercloud/hcloud-go v1.41.0
 	github.com/ionos-cloud/sdk-go/v6 v6.1.4
 	github.com/linode/linodego v1.14.1
 	github.com/melbahja/goph v1.3.1
@@ -82,10 +82,10 @@ require (
 	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4 // indirect
 	github.com/pkg/sftp v1.13.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/prometheus/client_golang v1.11.0 // indirect
-	github.com/prometheus/client_model v0.2.0 // indirect
-	github.com/prometheus/common v0.26.0 // indirect
-	github.com/prometheus/procfs v0.6.0 // indirect
+	github.com/prometheus/client_golang v1.14.0 // indirect
+	github.com/prometheus/client_model v0.3.0 // indirect
+	github.com/prometheus/common v0.37.0 // indirect
+	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/sony/gobreaker v0.5.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
