@@ -16,7 +16,7 @@ require (
 	github.com/digitalocean/godo v1.98.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.88.0
-	github.com/fatih/color v1.14.1
+	github.com/fatih/color v1.15.0
 	github.com/google/uuid v1.3.0
 	github.com/gophercloud/gophercloud v1.2.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
