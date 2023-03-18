@@ -10,7 +10,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.17.6
-	github.com/aws/aws-sdk-go-v2/config v1.18.17
+	github.com/aws/aws-sdk-go-v2/config v1.18.18
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.90.0
 	github.com/civo/civogo v0.3.24
 	github.com/digitalocean/godo v1.98.0
@@ -35,7 +35,7 @@ require (
 	go.uber.org/zap v1.24.0
 	golang.org/x/crypto v0.7.0
 	golang.org/x/oauth2 v0.6.0
-	google.golang.org/api v0.113.0
+	google.golang.org/api v0.114.0
 )
 
 require (
