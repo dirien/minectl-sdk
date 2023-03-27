@@ -43,7 +43,7 @@ func (v *Vultr) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 	if err != nil {
 		return nil, err
 	}
-	sshKey, err := v.client.SSHKey.Create(context.Background(), &govultr.SSHKeyReq{
+	sshKey, _, err := v.client.SSHKey.Create(context.Background(), &govultr.SSHKeyReq{
 		SSHKey: *publicKey,
 		Name:   fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()),
 	})
@@ -55,7 +55,7 @@ func (v *Vultr) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 	if err != nil {
 		return nil, err
 	}
-	startupScript, err := v.client.StartupScript.Create(context.Background(), &govultr.StartupScriptReq{
+	startupScript, _, err := v.client.StartupScript.Create(context.Background(), &govultr.StartupScriptReq{
 		Script: base64.StdEncoding.EncodeToString([]byte(script)),
 		Name:   fmt.Sprintf("%s-stackscript", args.MinecraftResource.GetName()),
 		Type:   "boot",
@@ -79,14 +79,14 @@ func (v *Vultr) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 		},
 	}
 
-	instance, err := v.client.Instance.Create(context.Background(), opts)
+	instance, _, err := v.client.Instance.Create(context.Background(), opts)
 	if err != nil {
 		return nil, err
 	}
 
 	stillCreating := true
 	for stillCreating {
-		instance, err = v.client.Instance.Get(context.Background(), instance.ID)
+		instance, _, err = v.client.Instance.Get(context.Background(), instance.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -107,7 +107,7 @@ func (v *Vultr) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 }
 
 func (v *Vultr) DeleteServer(id string, args automation.ServerArgs) error {
-	sshKeys, _, err := v.client.SSHKey.List(context.Background(), nil)
+	sshKeys, _, _, err := v.client.SSHKey.List(context.Background(), nil)
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func (v *Vultr) DeleteServer(id string, args automation.ServerArgs) error {
 }
 
 func (v *Vultr) ListServer() ([]automation.ResourceResults, error) {
-	instances, _, err := v.client.Instance.List(context.Background(), nil)
+	instances, _, _, err := v.client.Instance.List(context.Background(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (v *Vultr) ListServer() ([]automation.ResourceResults, error) {
 }
 
 func (v *Vultr) UpdateServer(id string, args automation.ServerArgs) error {
-	instance, err := v.client.Instance.Get(context.Background(), id)
+	instance, _, err := v.client.Instance.Get(context.Background(), id)
 	if err != nil {
 		return err
 	}
@@ -164,7 +164,7 @@ func (v *Vultr) UpdateServer(id string, args automation.ServerArgs) error {
 }
 
 func (v *Vultr) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
-	instance, err := v.client.Instance.Get(context.Background(), id)
+	instance, _, err := v.client.Instance.Get(context.Background(), id)
 	if err != nil {
 		return err
 	}
@@ -181,7 +181,7 @@ func (v *Vultr) UploadPlugin(id string, args automation.ServerArgs, plugin, dest
 }
 
 func (v *Vultr) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
-	instance, err := v.client.Instance.Get(context.Background(), id)
+	instance, _, err := v.client.Instance.Get(context.Background(), id)
 	if err != nil {
 		return nil, err
 	}
