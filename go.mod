@@ -5,27 +5,27 @@ go 1.20
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.4.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.2.2
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v4 v4.1.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v4 v4.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v2 v2.2.0
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.1.0
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.17.7
 	github.com/aws/aws-sdk-go-v2/config v1.18.19
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.91.0
-	github.com/civo/civogo v0.3.26
+	github.com/civo/civogo v0.3.28
 	github.com/digitalocean/godo v1.98.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.88.0
 	github.com/fatih/color v1.15.0
 	github.com/google/uuid v1.3.0
-	github.com/gophercloud/gophercloud v1.2.0
+	github.com/gophercloud/gophercloud v1.3.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.2
 	github.com/hetznercloud/hcloud-go v1.41.0
 	github.com/ionos-cloud/sdk-go/v6 v6.1.4
 	github.com/linode/linodego v1.15.0
 	github.com/melbahja/goph v1.3.1
-	github.com/oracle/oci-go-sdk/v65 v65.33.0
+	github.com/oracle/oci-go-sdk/v65 v65.33.1
 	github.com/packethost/packngo v0.29.0
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.15
