@@ -308,8 +308,8 @@ github.com/lestrrat-go/httpcc v1.0.0/go.mod h1:tGS/u00Vh5N6FHNkExqGGNId8e0Big+++
 github.com/lestrrat-go/iter v1.0.1/go.mod h1:zIdgO1mRKhn8l9vrZJZz9TUMMFbQbLeTsbqPDrJ/OJc=
 github.com/lestrrat-go/jwx v1.2.7/go.mod h1:bw24IXWbavc0R2RsOtpXL7RtMyP589yZ1+L7kd09ZGA=
 github.com/lestrrat-go/option v1.0.0/go.mod h1:5ZHFbivi4xwXxhxY9XHDe2FHo6/Z7WWmtT7T5nBBp3I=
-github.com/linode/linodego v1.15.0 h1:7LaXTp/QfH6HRi63YUisVctCqHpgqttwy65cCIbbC9c=
-github.com/linode/linodego v1.15.0/go.mod h1:f7lh/go9m8slMQ3a8B0dj5pVrZbpBFzwrRRhoX+YiV4=
+github.com/linode/linodego v1.16.0 h1:ufG7cWV5GZaP6buNj0lll73+Q0K8Uk3Kdq2zfrzhUQM=
+github.com/linode/linodego v1.16.0/go.mod h1:aESRAbpLY9R6IA1WGAWHikRI9DU9Lhesapv1MhKmPHM=
 github.com/mailru/easyjson v0.0.0-20190614124828-94de47d64c63/go.mod h1:C1wdFJiN94OJF2b5HbByQZoLdCWB1Yqtg26g4irojpc=
 github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e/go.mod h1:C1wdFJiN94OJF2b5HbByQZoLdCWB1Yqtg26g4irojpc=
 github.com/matryer/moq v0.0.0-20190312154309-6cfb0558e1bd/go.mod h1:9ELz6aaclSIGnZBoaSLZ3NAl1VTufbOrXBPvtcy6WiQ=
