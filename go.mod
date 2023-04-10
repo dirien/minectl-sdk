@@ -10,8 +10,8 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.1.0
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.17.8
-	github.com/aws/aws-sdk-go-v2/config v1.18.20
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.93.1
+	github.com/aws/aws-sdk-go-v2/config v1.18.21
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.93.2
 	github.com/civo/civogo v0.3.28
 	github.com/digitalocean/godo v1.98.0
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -35,7 +35,7 @@ require (
 	go.uber.org/zap v1.24.0
 	golang.org/x/crypto v0.8.0
 	golang.org/x/oauth2 v0.7.0
-	google.golang.org/api v0.116.0
+	google.golang.org/api v0.117.0
 )
 
 require (
@@ -45,15 +45,15 @@ require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v0.9.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.13.19 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.13.20 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.2 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.32 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.26 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.33 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.26 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.12.7 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.7 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.18.8 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.12.8 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.8 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.18.9 // indirect
 	github.com/aws/smithy-go v1.13.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
@@ -66,6 +66,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/s2a-go v0.1.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
@@ -98,7 +99,7 @@ require (
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230331144136-dcfb400f0633 // indirect
+	google.golang.org/genproto v0.0.0-20230403163135-c38d8f061ccd // indirect
 	google.golang.org/grpc v1.54.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.66.6 // indirect
