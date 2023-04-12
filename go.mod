@@ -21,11 +21,11 @@ require (
 	github.com/gophercloud/gophercloud v1.3.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.2
-	github.com/hetznercloud/hcloud-go v1.41.0
-	github.com/ionos-cloud/sdk-go/v6 v6.1.5
+	github.com/hetznercloud/hcloud-go v1.42.0
+	github.com/ionos-cloud/sdk-go/v6 v6.1.6
 	github.com/linode/linodego v1.16.0
 	github.com/melbahja/goph v1.3.1
-	github.com/oracle/oci-go-sdk/v65 v65.34.0
+	github.com/oracle/oci-go-sdk/v65 v65.35.0
 	github.com/packethost/packngo v0.29.0
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.15

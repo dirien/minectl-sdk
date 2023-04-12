@@ -69,8 +69,8 @@ func (i *IONOS) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 		return nil, err
 	}
 
-	lanRequest := ionoscloud.LanPost{
-		Properties: &ionoscloud.LanPropertiesPost{
+	lanRequest := ionoscloud.Lan{
+		Properties: &ionoscloud.LanProperties{
 			Name:   ionoscloud.PtrString(fmt.Sprintf("%s-lan", args.MinecraftResource.GetName())),
 			Public: ionoscloud.PtrBool(true),
 		},
