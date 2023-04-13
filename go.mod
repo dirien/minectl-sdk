@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.17.8
 	github.com/aws/aws-sdk-go-v2/config v1.18.21
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.93.2
-	github.com/civo/civogo v0.3.28
+	github.com/civo/civogo v0.3.29
 	github.com/digitalocean/godo v1.98.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.88.0
@@ -23,7 +23,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.2
 	github.com/hetznercloud/hcloud-go v1.42.0
 	github.com/ionos-cloud/sdk-go/v6 v6.1.6
-	github.com/linode/linodego v1.16.0
+	github.com/linode/linodego v1.16.1
 	github.com/melbahja/goph v1.3.1
 	github.com/oracle/oci-go-sdk/v65 v65.35.0
 	github.com/packethost/packngo v0.29.0
@@ -35,7 +35,7 @@ require (
 	go.uber.org/zap v1.24.0
 	golang.org/x/crypto v0.8.0
 	golang.org/x/oauth2 v0.7.0
-	google.golang.org/api v0.117.0
+	google.golang.org/api v0.118.0
 )
 
 require (
