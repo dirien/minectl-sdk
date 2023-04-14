@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.17.8
 	github.com/aws/aws-sdk-go-v2/config v1.18.21
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.93.2
-	github.com/civo/civogo v0.3.29
+	github.com/civo/civogo v0.3.30
 	github.com/digitalocean/godo v1.98.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.88.0
