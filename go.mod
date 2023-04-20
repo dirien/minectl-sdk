@@ -28,14 +28,14 @@ require (
 	github.com/oracle/oci-go-sdk/v65 v65.36.0
 	github.com/packethost/packngo v0.29.0
 	github.com/pkg/errors v0.9.1
-	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.15
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.16
 	github.com/sethvargo/go-password v0.2.0
 	github.com/stretchr/testify v1.8.2
 	github.com/vultr/govultr/v3 v3.0.2
 	go.uber.org/zap v1.24.0
 	golang.org/x/crypto v0.8.0
 	golang.org/x/oauth2 v0.7.0
-	google.golang.org/api v0.118.0
+	google.golang.org/api v0.119.0
 )
 
 require (
@@ -66,7 +66,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/google/s2a-go v0.1.0 // indirect
+	github.com/google/s2a-go v0.1.2 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
@@ -99,7 +99,7 @@ require (
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230403163135-c38d8f061ccd // indirect
+	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.54.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.66.6 // indirect
