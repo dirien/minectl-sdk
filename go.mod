@@ -21,7 +21,7 @@ require (
 	github.com/gophercloud/gophercloud v1.3.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.2
-	github.com/hetznercloud/hcloud-go v1.44.0
+	github.com/hetznercloud/hcloud-go v1.45.1
 	github.com/ionos-cloud/sdk-go/v6 v6.1.6
 	github.com/linode/linodego v1.16.2
 	github.com/melbahja/goph v1.3.1
