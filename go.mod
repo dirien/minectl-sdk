@@ -18,11 +18,11 @@ require (
 	github.com/exoscale/egoscale v0.88.0
 	github.com/fatih/color v1.15.0
 	github.com/google/uuid v1.3.0
-	github.com/gophercloud/gophercloud v1.3.0
+	github.com/gophercloud/gophercloud v1.4.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.2
 	github.com/hetznercloud/hcloud-go v1.45.1
-	github.com/ionos-cloud/sdk-go/v6 v6.1.6
+	github.com/ionos-cloud/sdk-go/v6 v6.1.7
 	github.com/linode/linodego v1.16.2
 	github.com/melbahja/goph v1.3.1
 	github.com/oracle/oci-go-sdk/v65 v65.39.0
