@@ -28,7 +28,7 @@ require (
 	github.com/oracle/oci-go-sdk/v65 v65.39.0
 	github.com/packethost/packngo v0.29.0
 	github.com/pkg/errors v0.9.1
-	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.16
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.17
 	github.com/sethvargo/go-password v0.2.0
 	github.com/stretchr/testify v1.8.3
 	github.com/vultr/govultr/v3 v3.0.2
