@@ -59,7 +59,7 @@ func (h *Hetzner) CreateServer(args automation.ServerArgs) (*automation.Resource
 			Name:     fmt.Sprintf("%s-vol", args.MinecraftResource.GetName()),
 			Size:     args.MinecraftResource.GetVolumeSize(),
 			Location: location,
-			Format:   hcloud.String("ext4"),
+			Format:   hcloud.Ptr("ext4"),
 		})
 		if err != nil {
 			return nil, err
@@ -70,7 +70,11 @@ func (h *Hetzner) CreateServer(args automation.ServerArgs) (*automation.Resource
 	if err != nil {
 		return nil, err
 	}
-	image, _, err := h.client.Image.GetByName(context.Background(), "ubuntu-22.04")
+	arch := hcloud.ArchitectureX86
+	if args.MinecraftResource.IsArm() {
+		arch = hcloud.ArchitectureARM
+	}
+	image, _, err := h.client.Image.GetByNameAndArchitecture(context.Background(), "ubuntu-22.04", arch)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +96,7 @@ func (h *Hetzner) CreateServer(args automation.ServerArgs) (*automation.Resource
 
 	if args.MinecraftResource.GetVolumeSize() > 0 {
 		requestOpts.Volumes = []*hcloud.Volume{volume.Volume}
-		requestOpts.Automount = hcloud.Bool(true)
+		requestOpts.Automount = hcloud.Ptr(true)
 	}
 
 	serverCreateReq, _, err := h.client.Server.Create(context.Background(), requestOpts)
@@ -156,7 +160,10 @@ func (h *Hetzner) DeleteServer(id string, args automation.ServerArgs) error {
 			return err
 		}
 	}
-	_, err = h.client.Server.Delete(context.Background(), server)
+	_, _, err = h.client.Server.DeleteWithResult(context.Background(), server)
+	if err != nil {
+		return err
+	}
 	if err != nil {
 		return err
 	}
@@ -236,7 +243,7 @@ func (h *Hetzner) UploadPlugin(id string, args automation.ServerArgs, plugin, de
 	return nil
 }
 
-func (h *Hetzner) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
+func (h *Hetzner) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
 	intID, _ := strconv.Atoi(id)
 	instance, _, err := h.client.Server.GetByID(context.Background(), intID)
 	if err != nil {
