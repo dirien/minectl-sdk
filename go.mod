@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.18.1
 	github.com/aws/aws-sdk-go-v2/config v1.18.27
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.102.0
-	github.com/civo/civogo v0.3.37
+	github.com/civo/civogo v0.3.38
 	github.com/digitalocean/godo v1.99.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.88.0
@@ -28,7 +28,7 @@ require (
 	github.com/oracle/oci-go-sdk/v65 v65.42.0
 	github.com/packethost/packngo v0.30.0
 	github.com/pkg/errors v0.9.1
-	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.17
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.18
 	github.com/sethvargo/go-password v0.2.0
 	github.com/stretchr/testify v1.8.4
 	github.com/vultr/govultr/v3 v3.0.3
