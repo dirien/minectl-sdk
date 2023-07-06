@@ -11,8 +11,8 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.18.1
 	github.com/aws/aws-sdk-go-v2/config v1.18.27
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.102.0
-	github.com/civo/civogo v0.3.38
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.103.0
+	github.com/civo/civogo v0.3.39
 	github.com/digitalocean/godo v1.99.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.88.0
