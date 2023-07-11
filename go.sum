@@ -67,8 +67,8 @@ github.com/cespare/xxhash/v2 v2.2.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
 github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
-github.com/civo/civogo v0.3.39 h1:oo9MlLaP9+iDdibFlgacCVd9771BOnOF1vt6G3PeQGg=
-github.com/civo/civogo v0.3.39/go.mod h1:54lv/FOf7gh6wE9ZwVdw4yBehk8V1CvU9aWa4v6dvW0=
+github.com/civo/civogo v0.3.40 h1:zgFkMvs5HM5OUkhUqrv0xSmXboFncEW14GpEGXp1y+Q=
+github.com/civo/civogo v0.3.40/go.mod h1:54lv/FOf7gh6wE9ZwVdw4yBehk8V1CvU9aWa4v6dvW0=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnhtbo57+VJT5O0JRkEi1Wbu0z5j0R8u5Hbk=
@@ -251,8 +251,8 @@ github.com/lestrrat-go/httpcc v1.0.0/go.mod h1:tGS/u00Vh5N6FHNkExqGGNId8e0Big+++
 github.com/lestrrat-go/iter v1.0.1/go.mod h1:zIdgO1mRKhn8l9vrZJZz9TUMMFbQbLeTsbqPDrJ/OJc=
 github.com/lestrrat-go/jwx v1.2.7/go.mod h1:bw24IXWbavc0R2RsOtpXL7RtMyP589yZ1+L7kd09ZGA=
 github.com/lestrrat-go/option v1.0.0/go.mod h1:5ZHFbivi4xwXxhxY9XHDe2FHo6/Z7WWmtT7T5nBBp3I=
-github.com/linode/linodego v1.18.0 h1:x9TbuOFadc2OgAt9AliZi6y7ig8fgkbFTRacGrZ5Lek=
-github.com/linode/linodego v1.18.0/go.mod h1:C2iyT3Vg2O2sPxkWka4XAQ5WSUtm5LmTZ3Adw43Ra7Q=
+github.com/linode/linodego v1.19.0 h1:n4WJrcr9+30e9JGZ6DI0nZbm5SdAj1kSwvvt/998YUw=
+github.com/linode/linodego v1.19.0/go.mod h1:XZFR+yJ9mm2kwf6itZ6SCpu+6w3KnIevV0Uu5HNWJgQ=
 github.com/mailru/easyjson v0.0.0-20190614124828-94de47d64c63/go.mod h1:C1wdFJiN94OJF2b5HbByQZoLdCWB1Yqtg26g4irojpc=
 github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e/go.mod h1:C1wdFJiN94OJF2b5HbByQZoLdCWB1Yqtg26g4irojpc=
 github.com/mailru/easyjson v0.7.7/go.mod h1:xzfreul335JAWq5oZzymOObrkdz5UnU4kGfJJLY9Nlc=
@@ -313,8 +313,8 @@ github.com/onsi/gomega v1.27.1/go.mod h1:aHX5xOykVYzWOV4WqQy0sy8BQptgukenXpCXfad
 github.com/onsi/gomega v1.27.3/go.mod h1:5vG284IBtfDAmDyrK+eGyZmUgUlmi+Wngqo557cZ6Gw=
 github.com/onsi/gomega v1.27.4 h1:Z2AnStgsdSayCMDiCU42qIz+HLqEPcgiOCXjAU/w+8E=
 github.com/onsi/gomega v1.27.4/go.mod h1:riYq/GJKh8hhoM01HN6Vmuy93AarCXCBGpvFDK3q3fQ=
-github.com/oracle/oci-go-sdk/v65 v65.42.0 h1:INtfBU3rsPhlE6g5Sr5KCyezs4+qJdOErUSSZusxV9Y=
-github.com/oracle/oci-go-sdk/v65 v65.42.0/go.mod h1:IBEV9l1qBzUpo7zgGaRUhbB05BVfcDGYRFBCPlTcPp0=
+github.com/oracle/oci-go-sdk/v65 v65.43.0 h1:yVv7L6yxhCFVLja2d1bV4Ny/lmCPRDm9J4OU4ANdSRo=
+github.com/oracle/oci-go-sdk/v65 v65.43.0/go.mod h1:IBEV9l1qBzUpo7zgGaRUhbB05BVfcDGYRFBCPlTcPp0=
 github.com/ovh/go-ovh v1.3.0 h1:mvZaddk4E4kLcXhzb+cxBsMPYp2pHqiQpWYkInsuZPQ=
 github.com/ovh/go-ovh v1.3.0/go.mod h1:AxitLZ5HBRPyUd+Zl60Ajaag+rNTdVXWIkzfrVuTXWA=
 github.com/packethost/packngo v0.30.0 h1:JVeTwbXXETsLTDQncUbYwIFpkOp/xevXrffM2HrFECI=
