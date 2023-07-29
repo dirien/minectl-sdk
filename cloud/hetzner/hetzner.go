@@ -13,7 +13,7 @@ import (
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
-	"github.com/hetznercloud/hcloud-go/hcloud"
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 type Hetzner struct {
