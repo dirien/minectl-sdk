@@ -13,7 +13,7 @@ import (
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
-	"github.com/hetznercloud/hcloud-go/hcloud"
+	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
 type Hetzner struct {
@@ -118,7 +118,7 @@ func (h *Hetzner) CreateServer(args automation.ServerArgs) (*automation.Resource
 		}
 	}
 	return &automation.ResourceResults{
-		ID:       strconv.Itoa(server.ID),
+		ID:       strconv.FormatInt(server.ID, 10),
 		Name:     server.Name,
 		Region:   server.Datacenter.Location.Name,
 		PublicIP: server.PublicNet.IPv4.IP.String(),
@@ -127,7 +127,7 @@ func (h *Hetzner) CreateServer(args automation.ServerArgs) (*automation.Resource
 }
 
 func (h *Hetzner) DeleteServer(id string, args automation.ServerArgs) error {
-	serverID, _ := strconv.Atoi(id)
+	serverID, _ := strconv.ParseInt(id, 10, 64)
 	server, _, err := h.client.Server.GetByID(context.Background(), serverID)
 	if err != nil {
 		return err
@@ -197,7 +197,7 @@ func (h *Hetzner) ListServer() ([]automation.ResourceResults, error) {
 		for key := range server.Labels {
 			if key == common.InstanceTag {
 				result = append(result, automation.ResourceResults{
-					ID:       strconv.Itoa(server.ID),
+					ID:       strconv.FormatInt(server.ID, 10),
 					Name:     server.Name,
 					Region:   server.Datacenter.Location.Name,
 					PublicIP: server.PublicNet.IPv4.IP.String(),
@@ -210,7 +210,7 @@ func (h *Hetzner) ListServer() ([]automation.ResourceResults, error) {
 }
 
 func (h *Hetzner) UpdateServer(id string, args automation.ServerArgs) error {
-	intID, _ := strconv.Atoi(id)
+	intID, _ := strconv.ParseInt(id, 10, 64)
 	instance, _, err := h.client.Server.GetByID(context.Background(), intID)
 	if err != nil {
 		return err
@@ -225,7 +225,7 @@ func (h *Hetzner) UpdateServer(id string, args automation.ServerArgs) error {
 }
 
 func (h *Hetzner) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
-	intID, _ := strconv.Atoi(id)
+	intID, _ := strconv.ParseInt(id, 10, 64)
 	instance, _, err := h.client.Server.GetByID(context.Background(), intID)
 	if err != nil {
 		return err
@@ -244,13 +244,13 @@ func (h *Hetzner) UploadPlugin(id string, args automation.ServerArgs, plugin, de
 }
 
 func (h *Hetzner) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
-	intID, _ := strconv.Atoi(id)
+	intID, _ := strconv.ParseInt(id, 10, 64)
 	instance, _, err := h.client.Server.GetByID(context.Background(), intID)
 	if err != nil {
 		return nil, err
 	}
 	return &automation.ResourceResults{
-		ID:       strconv.Itoa(instance.ID),
+		ID:       strconv.FormatInt(instance.ID, 10),
 		Name:     instance.Name,
 		Region:   instance.Datacenter.Location.Name,
 		PublicIP: instance.PublicNet.IPv4.IP.String(),
