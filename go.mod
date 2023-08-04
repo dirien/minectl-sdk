@@ -11,7 +11,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.20.0
 	github.com/aws/aws-sdk-go-v2/config v1.18.32
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.109.1
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.110.0
 	github.com/civo/civogo v0.3.42
 	github.com/digitalocean/godo v1.100.0
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -23,7 +23,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.4
 	github.com/hetznercloud/hcloud-go/v2 v2.0.0
 	github.com/ionos-cloud/sdk-go/v6 v6.1.8
-	github.com/linode/linodego v1.19.0
+	github.com/linode/linodego v1.20.0
 	github.com/melbahja/goph v1.3.1
 	github.com/oracle/oci-go-sdk/v65 v65.46.0
 	github.com/packethost/packngo v0.30.0
@@ -99,7 +99,7 @@ require (
 	github.com/stretchr/objx v0.5.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
-	golang.org/x/net v0.12.0 // indirect
+	golang.org/x/net v0.13.0 // indirect
 	golang.org/x/sys v0.10.0 // indirect
 	golang.org/x/text v0.11.0 // indirect
 	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af // indirect
