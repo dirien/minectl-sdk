@@ -21,7 +21,7 @@ require (
 	github.com/gophercloud/gophercloud v1.5.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.4
-	github.com/hetznercloud/hcloud-go/v2 v2.0.0
+	github.com/hetznercloud/hcloud-go/v2 v2.1.0
 	github.com/ionos-cloud/sdk-go/v6 v6.1.8
 	github.com/linode/linodego v1.20.1
 	github.com/melbahja/goph v1.3.1
@@ -31,7 +31,7 @@ require (
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.20
 	github.com/sethvargo/go-password v0.2.0
 	github.com/stretchr/testify v1.8.4
-	github.com/vultr/govultr/v3 v3.2.0
+	github.com/vultr/govultr/v3 v3.3.0
 	go.uber.org/zap v1.25.0
 	golang.org/x/crypto v0.12.0
 	golang.org/x/oauth2 v0.11.0
