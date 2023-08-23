@@ -6,11 +6,11 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.7.1
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.3.1
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5 v5.1.0
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v4 v4.0.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v4 v4.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.1.1
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.21.0
-	github.com/aws/aws-sdk-go-v2/config v1.18.36
+	github.com/aws/aws-sdk-go-v2/config v1.18.37
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.114.0
 	github.com/civo/civogo v0.3.43
 	github.com/digitalocean/godo v1.102.1
