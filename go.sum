@@ -14,8 +14,8 @@ github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5 v5.1
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5 v5.1.0/go.mod h1:Kyqzdqq0XDoCm+o9aZ25wZBmBUBzPBzPAj1R5rYsT6I=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/internal v1.1.2 h1:mLY+pNLjCUeKhgnAJWAKhEUQM+RJQo2H1fuGSw1Ky1E=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/managementgroups/armmanagementgroups v1.0.0 h1:pPvTJ1dY0sA35JOeFq6TsY2xj6Z85Yo23Pj4wCCvu4o=
-github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v4 v4.0.0 h1:pqCyNi/Paz03SbWRmGlb5WBzK14aOXVuSJuOTWzOM5M=
-github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v4 v4.0.0/go.mod h1:bCUhQ1sbQHAG4nm1SqWwLlnKnRVT2e6Lu0cij7OzliM=
+github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v4 v4.1.0 h1:CNHJpPiOM3FHaF0vXch5U9CY8lgzwQ5T4SBD/e2N03M=
+github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v4 v4.1.0/go.mod h1:pw/iPLHx25GjvPaTHaU3qH07SnGr4RmXSqR9o1+aCtI=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.1.1 h1:7CBQ+Ei8SP2c6ydQTGCCrS35bDxgTMfoP2miAwK++OU=
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.1.1/go.mod h1:c/wcGeGx5FUPbM/JltUYHZcKmigwyVLJlDq+4HdtXaw=
 github.com/AzureAD/microsoft-authentication-library-for-go v1.1.1 h1:WpB/QDNLpMw72xHJc34BNNykqSOeEJDAWkhf0u12/Jk=
@@ -33,8 +33,8 @@ github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5/go.mod h1:wHh0iHkY
 github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a/go.mod h1:lB+ZfQJz7igIIfQNfa7Ml4HSf2uFQQRzpGGRXenZAgY=
 github.com/aws/aws-sdk-go-v2 v1.21.0 h1:gMT0IW+03wtYJhRqTVYn0wLzwdnK9sRMcxmtfGzRdJc=
 github.com/aws/aws-sdk-go-v2 v1.21.0/go.mod h1:/RfNgGmRxI+iFOB1OeJUyxiU+9s88k3pfHvDagGEp0M=
-github.com/aws/aws-sdk-go-v2/config v1.18.36 h1:mLNA12PWU1Y+ueOO79QgQfKIPhc1MYKl44RmvASkJ7Q=
-github.com/aws/aws-sdk-go-v2/config v1.18.36/go.mod h1:8AnEFxW9/XGKCbjYDCJy7iltVNyEI9Iu9qC21UzhhgQ=
+github.com/aws/aws-sdk-go-v2/config v1.18.37 h1:RNAfbPqw1CstCooHaTPhScz7z1PyocQj0UL+l95CgzI=
+github.com/aws/aws-sdk-go-v2/config v1.18.37/go.mod h1:8AnEFxW9/XGKCbjYDCJy7iltVNyEI9Iu9qC21UzhhgQ=
 github.com/aws/aws-sdk-go-v2/credentials v1.13.35 h1:QpsNitYJu0GgvMBLUIYu9H4yryA5kMksjeIVQfgXrt8=
 github.com/aws/aws-sdk-go-v2/credentials v1.13.35/go.mod h1:o7rCaLtvK0hUggAGclf76mNGGkaG5a9KWlp+d9IpcV8=
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.11 h1:uDZJF1hu0EVT/4bogChk8DyjSF6fof6uL/0Y26Ma7Fg=
