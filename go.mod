@@ -11,7 +11,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.21.0
 	github.com/aws/aws-sdk-go-v2/config v1.18.37
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.114.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.115.0
 	github.com/civo/civogo v0.3.43
 	github.com/digitalocean/godo v1.102.1
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -21,7 +21,7 @@ require (
 	github.com/gophercloud/gophercloud v1.5.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.4
-	github.com/hetznercloud/hcloud-go/v2 v2.1.1
+	github.com/hetznercloud/hcloud-go/v2 v2.2.0
 	github.com/ionos-cloud/sdk-go/v6 v6.1.8
 	github.com/linode/linodego v1.20.1
 	github.com/melbahja/goph v1.3.1
