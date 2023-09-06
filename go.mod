@@ -10,8 +10,8 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.1.1
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.21.0
-	github.com/aws/aws-sdk-go-v2/config v1.18.38
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.115.0
+	github.com/aws/aws-sdk-go-v2/config v1.18.39
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.116.0
 	github.com/civo/civogo v0.3.45
 	github.com/digitalocean/godo v1.102.1
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -22,10 +22,10 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.4
 	github.com/hetznercloud/hcloud-go/v2 v2.2.0
-	github.com/ionos-cloud/sdk-go/v6 v6.1.8
+	github.com/ionos-cloud/sdk-go/v6 v6.1.9
 	github.com/linode/linodego v1.21.0
 	github.com/melbahja/goph v1.3.1
-	github.com/oracle/oci-go-sdk/v65 v65.48.0
+	github.com/oracle/oci-go-sdk/v65 v65.49.0
 	github.com/packethost/packngo v0.30.0
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.20
@@ -33,8 +33,8 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/vultr/govultr/v3 v3.3.1
 	go.uber.org/zap v1.25.0
-	golang.org/x/crypto v0.12.0
-	golang.org/x/oauth2 v0.11.0
+	golang.org/x/crypto v0.13.0
+	golang.org/x/oauth2 v0.12.0
 	google.golang.org/api v0.138.0
 )
 
@@ -45,14 +45,14 @@ require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.1.1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.13.36 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.13.37 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.11 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.41 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.35 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.42 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.35 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.13.6 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.15.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.15.6 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.21.5 // indirect
 	github.com/aws/smithy-go v1.14.2 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -99,9 +99,9 @@ require (
 	github.com/stretchr/objx v0.5.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
-	golang.org/x/net v0.14.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
-	golang.org/x/text v0.12.0 // indirect
+	golang.org/x/net v0.15.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230807174057-1744710a1577 // indirect
