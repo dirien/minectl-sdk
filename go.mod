@@ -3,7 +3,7 @@ module github.com/dirien/minectl-sdk
 go 1.20
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.7.1
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.7.2
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.3.1
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5 v5.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v4 v4.1.0
@@ -11,7 +11,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.21.0
 	github.com/aws/aws-sdk-go-v2/config v1.18.39
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.116.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.117.0
 	github.com/civo/civogo v0.3.45
 	github.com/digitalocean/godo v1.102.1
 	github.com/dirien/ovh-go-sdk v0.2.0
