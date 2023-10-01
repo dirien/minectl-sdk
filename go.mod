@@ -15,7 +15,7 @@ require (
 	github.com/civo/civogo v0.3.46
 	github.com/digitalocean/godo v1.102.1
 	github.com/dirien/ovh-go-sdk v0.2.0
-	github.com/exoscale/egoscale v0.88.0
+	github.com/exoscale/egoscale v0.101.1
 	github.com/fatih/color v1.15.0
 	github.com/google/uuid v1.3.1
 	github.com/gophercloud/gophercloud v1.7.0
@@ -62,7 +62,7 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
-	github.com/gofrs/uuid v3.2.0+incompatible // indirect
+	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
