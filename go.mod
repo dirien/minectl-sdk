@@ -11,13 +11,13 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.21.2
 	github.com/aws/aws-sdk-go-v2/config v1.19.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.127.0
-	github.com/civo/civogo v0.3.51
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.128.0
+	github.com/civo/civogo v0.3.52
 	github.com/digitalocean/godo v1.105.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.101.1
 	github.com/fatih/color v1.15.0
-	github.com/google/uuid v1.3.1
+	github.com/google/uuid v1.4.0
 	github.com/gophercloud/gophercloud v1.7.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.4
