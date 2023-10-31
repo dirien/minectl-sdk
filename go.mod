@@ -31,7 +31,7 @@ require (
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.21
 	github.com/sethvargo/go-password v0.2.0
 	github.com/stretchr/testify v1.8.4
-	github.com/vultr/govultr/v3 v3.3.3
+	github.com/vultr/govultr/v3 v3.3.4
 	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.14.0
 	golang.org/x/oauth2 v0.13.0
