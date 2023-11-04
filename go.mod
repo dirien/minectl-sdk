@@ -23,7 +23,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.4
 	github.com/hetznercloud/hcloud-go/v2 v2.4.0
 	github.com/ionos-cloud/sdk-go/v6 v6.1.9
-	github.com/linode/linodego v1.24.0
+	github.com/linode/linodego v1.24.1
 	github.com/melbahja/goph v1.4.0
 	github.com/oracle/oci-go-sdk/v65 v65.52.0
 	github.com/packethost/packngo v0.30.0
