@@ -11,7 +11,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.22.2
 	github.com/aws/aws-sdk-go-v2/config v1.23.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.131.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.132.0
 	github.com/civo/civogo v0.3.53
 	github.com/digitalocean/godo v1.105.1
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -31,7 +31,7 @@ require (
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.21
 	github.com/sethvargo/go-password v0.2.0
 	github.com/stretchr/testify v1.8.4
-	github.com/vultr/govultr/v3 v3.3.4
+	github.com/vultr/govultr/v3 v3.4.0
 	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.15.0
 	golang.org/x/oauth2 v0.14.0
