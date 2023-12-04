@@ -37,7 +37,7 @@ require (
 	google.golang.org/api v0.152.0
 )
 
-require github.com/oracle/oci-go-sdk/v65 v65.53.0
+require github.com/oracle/oci-go-sdk/v65 v65.54.0
 
 require (
 	cloud.google.com/go/compute v1.23.3 // indirect
