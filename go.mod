@@ -21,7 +21,6 @@ require (
 	github.com/gophercloud/gophercloud v1.8.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.5
-	github.com/hetznercloud/hcloud-go/v2 v2.5.0
 	github.com/ionos-cloud/sdk-go/v6 v6.1.10
 	github.com/linode/linodego v1.25.0
 	github.com/melbahja/goph v1.4.0
@@ -37,7 +36,10 @@ require (
 	google.golang.org/api v0.154.0
 )
 
-require github.com/oracle/oci-go-sdk/v65 v65.55.0
+require (
+	github.com/hetznercloud/hcloud-go/v2 v2.5.1
+	github.com/oracle/oci-go-sdk/v65 v65.55.0
+)
 
 require (
 	cloud.google.com/go/compute v1.23.3 // indirect
