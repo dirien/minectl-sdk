@@ -26,10 +26,10 @@ require (
 	github.com/melbahja/goph v1.4.0
 	github.com/packethost/packngo v0.30.0
 	github.com/pkg/errors v0.9.1
-	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.21
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.22
 	github.com/sethvargo/go-password v0.2.0
 	github.com/stretchr/testify v1.8.4
-	github.com/vultr/govultr/v3 v3.5.0
+	github.com/vultr/govultr/v3 v3.6.0
 	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.16.0
 	golang.org/x/oauth2 v0.15.0
