@@ -11,8 +11,8 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.24.0
 	github.com/aws/aws-sdk-go-v2/config v1.26.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.141.0
-	github.com/civo/civogo v0.3.53
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.142.0
+	github.com/civo/civogo v0.3.55
 	github.com/digitalocean/godo v1.107.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.101.1
@@ -24,7 +24,7 @@ require (
 	github.com/ionos-cloud/sdk-go/v6 v6.1.11
 	github.com/linode/linodego v1.26.0
 	github.com/melbahja/goph v1.4.0
-	github.com/packethost/packngo v0.30.0
+	github.com/packethost/packngo v0.31.0
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.22
 	github.com/sethvargo/go-password v0.2.0
