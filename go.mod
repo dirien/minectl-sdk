@@ -21,8 +21,8 @@ require (
 	github.com/gophercloud/gophercloud v1.8.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.5
-	github.com/ionos-cloud/sdk-go/v6 v6.1.10
-	github.com/linode/linodego v1.25.0
+	github.com/ionos-cloud/sdk-go/v6 v6.1.11
+	github.com/linode/linodego v1.26.0
 	github.com/melbahja/goph v1.4.0
 	github.com/packethost/packngo v0.30.0
 	github.com/pkg/errors v0.9.1
@@ -31,7 +31,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/vultr/govultr/v3 v3.6.0
 	go.uber.org/zap v1.26.0
-	golang.org/x/crypto v0.16.0
+	golang.org/x/crypto v0.17.0
 	golang.org/x/oauth2 v0.15.0
 	google.golang.org/api v0.154.0
 )
