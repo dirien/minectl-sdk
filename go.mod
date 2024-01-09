@@ -9,7 +9,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.24.1
 	github.com/aws/aws-sdk-go-v2/config v1.26.3
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.142.1
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.143.0
 	github.com/civo/civogo v0.3.56
 	github.com/digitalocean/godo v1.107.0
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -20,7 +20,7 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.5
 	github.com/ionos-cloud/sdk-go/v6 v6.1.11
-	github.com/linode/linodego v1.26.0
+	github.com/linode/linodego v1.27.0
 	github.com/melbahja/goph v1.4.0
 	github.com/packethost/packngo v0.31.0
 	github.com/pkg/errors v0.9.1
@@ -29,8 +29,8 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/vultr/govultr/v3 v3.6.0
 	go.uber.org/zap v1.26.0
-	golang.org/x/crypto v0.17.0
-	golang.org/x/oauth2 v0.15.0
+	golang.org/x/crypto v0.18.0
+	golang.org/x/oauth2 v0.16.0
 	google.golang.org/api v0.155.0
 )
 
@@ -109,8 +109,8 @@ require (
 	go.opentelemetry.io/otel/metric v1.21.0 // indirect
 	go.opentelemetry.io/otel/trace v1.21.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
-	golang.org/x/net v0.19.0 // indirect
-	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/net v0.20.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
