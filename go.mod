@@ -31,14 +31,14 @@ require (
 	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.18.0
 	golang.org/x/oauth2 v0.16.0
-	google.golang.org/api v0.160.0
+	google.golang.org/api v0.161.0
 )
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5 v5.5.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5 v5.0.0
 	github.com/hetznercloud/hcloud-go/v2 v2.6.0
-	github.com/oracle/oci-go-sdk/v65 v65.56.1
+	github.com/oracle/oci-go-sdk/v65 v65.57.0
 )
 
 require (
