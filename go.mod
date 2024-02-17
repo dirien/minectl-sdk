@@ -9,7 +9,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.25.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.0
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.147.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.148.0
 	github.com/civo/civogo v0.3.58
 	github.com/digitalocean/godo v1.109.0
 	github.com/dirien/ovh-go-sdk v0.2.0
