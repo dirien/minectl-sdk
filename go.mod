@@ -16,7 +16,7 @@ require (
 	github.com/exoscale/egoscale v0.101.1
 	github.com/fatih/color v1.16.0
 	github.com/google/uuid v1.6.0
-	github.com/gophercloud/gophercloud v1.9.0
+	github.com/gophercloud/gophercloud v1.10.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.5
 	github.com/ionos-cloud/sdk-go/v6 v6.1.11
@@ -36,9 +36,9 @@ require (
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5 v5.5.0
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5 v5.0.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5 v5.1.0
 	github.com/hetznercloud/hcloud-go/v2 v2.6.0
-	github.com/oracle/oci-go-sdk/v65 v65.59.0
+	github.com/oracle/oci-go-sdk/v65 v65.60.0
 )
 
 require (
