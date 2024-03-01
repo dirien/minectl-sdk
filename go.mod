@@ -3,14 +3,14 @@ module github.com/dirien/minectl-sdk
 go 1.20
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.9.2
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.10.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.5.1
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.2.0
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.25.2
 	github.com/aws/aws-sdk-go-v2/config v1.27.4
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.149.1
-	github.com/civo/civogo v0.3.60
+	github.com/civo/civogo v0.3.61
 	github.com/digitalocean/godo v1.109.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.101.1
@@ -27,7 +27,7 @@ require (
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.24
 	github.com/sethvargo/go-password v0.2.0
 	github.com/stretchr/testify v1.8.4
-	github.com/vultr/govultr/v3 v3.6.2
+	github.com/vultr/govultr/v3 v3.6.3
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.20.0
 	golang.org/x/oauth2 v0.17.0
