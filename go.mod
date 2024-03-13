@@ -9,8 +9,8 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.25.3
 	github.com/aws/aws-sdk-go-v2/config v1.27.7
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.150.0
-	github.com/civo/civogo v0.3.61
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.150.1
+	github.com/civo/civogo v0.3.63
 	github.com/digitalocean/godo v1.109.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/exoscale/egoscale v0.101.1
@@ -38,7 +38,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5 v5.5.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5 v5.1.0
 	github.com/hetznercloud/hcloud-go/v2 v2.6.0
-	github.com/oracle/oci-go-sdk/v65 v65.61.0
+	github.com/oracle/oci-go-sdk/v65 v65.61.1
 )
 
 require (
@@ -109,6 +109,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
+	golang.org/x/mod v0.16.0 // indirect
 	golang.org/x/net v0.22.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
