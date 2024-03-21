@@ -35,7 +35,7 @@ require (
 )
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5 v5.5.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5 v5.6.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5 v5.1.0
 	github.com/hetznercloud/hcloud-go/v2 v2.6.0
 	github.com/oracle/oci-go-sdk/v65 v65.61.2
