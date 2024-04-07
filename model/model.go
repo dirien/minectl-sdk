@@ -202,3 +202,23 @@ func (m *MinecraftResource) IsSpot() bool {
 func (m *MinecraftResource) IsArm() bool {
 	return m.Spec.Server.Arm
 }
+
+const (
+	PROVIDER_HETZNER      = "hetzner"
+	PROVIDER_DIGITALOCEAN = "do"
+	PROVIDER_CIVO         = "civo"
+	PROVIDER_SCALEWAY     = "scaleway"
+	PROVIDER_AKAMAI       = "akamai"
+	PROVIDER_OVH          = "ovh"
+	PROVIDER_EQUINIX      = "equinix"
+	PROVIDER_GCE          = "gce"
+	PROVIDER_VULTR        = "vultr"
+	PROVIDER_AZURE        = "azure"
+	PROVIDER_OCI          = "oci"
+	PROVIDER_IONOS        = "ionos"
+	PROVIDER_AWS          = "aws"
+	PROVIDER_VEXXHOST     = "vexxhost"
+	PROVIDER_FUGA         = "fuga"
+	PROVIDER_EXOSCALE     = "exoscale"
+	PROVIDER_MULTIPASS    = "multipass"
+)
