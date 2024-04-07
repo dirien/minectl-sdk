@@ -1,6 +1,7 @@
 package equinix
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -11,39 +12,34 @@ import (
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
-	"github.com/hashicorp/go-retryablehttp"
-	"github.com/packethost/packngo"
+	metal "github.com/equinix/equinix-sdk-go/services/metalv1"
 )
 
 type Equinix struct {
-	client  *packngo.Client
+	client  *metal.APIClient
 	project string
 	tmpl    *minctlTemplate.Template
 }
 
 func NewEquinix(apiKey, project string) (*Equinix, error) {
-	httpClient := retryablehttp.NewClient().HTTPClient
 	tmpl, err := minctlTemplate.NewTemplateBash()
 	if err != nil {
 		return nil, err
 	}
+
+	configuration := metal.NewConfiguration()
+	configuration.AddDefaultHeader("X-Auth-Token", apiKey)
+
 	return &Equinix{
-		client:  packngo.NewClientWithAuth("", apiKey, httpClient),
+		client:  metal.NewAPIClient(configuration),
 		project: project,
 		tmpl:    tmpl,
 	}, nil
 }
 
 func (e *Equinix) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
+	ctx := context.Background()
 	publicKey, err := cloud.GetSSHPublicKey(args)
-	if err != nil {
-		return nil, err
-	}
-	key, _, err := e.client.SSHKeys.Create(&packngo.SSHKeyCreateRequest{
-		Label:     fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()),
-		ProjectID: e.project,
-		Key:       *publicKey,
-	})
 	if err != nil {
 		return nil, err
 	}
@@ -53,29 +49,35 @@ func (e *Equinix) CreateServer(args automation.ServerArgs) (*automation.Resource
 		return nil, err
 	}
 
-	server, _, err := e.client.Devices.Create(&packngo.DeviceCreateRequest{
-		Hostname:       args.MinecraftResource.GetName(),
-		ProjectID:      e.project,
-		OS:             "ubuntu_22_04",
-		Plan:           args.MinecraftResource.GetSize(),
-		Tags:           []string{common.InstanceTag, args.MinecraftResource.GetEdition()},
-		ProjectSSHKeys: []string{key.ID},
-		UserData:       userData,
-		BillingCycle:   "hourly",
-		Metro:          args.MinecraftResource.GetRegion(),
-		SpotInstance:   false,
-	})
+	server, _, err := e.client.DevicesApi.CreateDevice(ctx, e.project).CreateDeviceRequest(metal.CreateDeviceRequest{
+		DeviceCreateInMetroInput: &metal.DeviceCreateInMetroInput{
+			Hostname:        metal.PtrString(args.MinecraftResource.GetName()),
+			OperatingSystem: "ubuntu_22_04",
+			Plan:            args.MinecraftResource.GetSize(),
+			Tags:            []string{common.InstanceTag, args.MinecraftResource.GetEdition()},
+			SshKeys: []metal.SSHKeyInput{
+				{
+					Label: metal.PtrString(fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName())),
+					Key:   metal.PtrString(*publicKey),
+				},
+			},
+			Userdata:     metal.PtrString(userData),
+			BillingCycle: metal.DeviceCreateInputBillingCycle.Ptr(metal.DEVICECREATEINPUTBILLINGCYCLE_HOURLY),
+			Metro:        args.MinecraftResource.GetRegion(),
+			SpotInstance: metal.PtrBool(false),
+		},
+	}).Execute()
 	if err != nil {
 		return nil, err
 	}
 	stillCreating := true
 	for stillCreating {
-		server, _, err = e.client.Devices.Get(server.ID, nil)
+		server, _, err = e.client.DevicesApi.FindDeviceById(ctx, server.GetId()).Execute()
 		if err != nil {
 			return nil, err
 		}
 
-		if server.State == "active" {
+		if server.GetState() == metal.DEVICESTATE_ACTIVE && len(server.GetIpAddresses()) > 1 {
 			stillCreating = false
 		} else {
 			time.Sleep(2 * time.Second)
@@ -83,67 +85,57 @@ func (e *Equinix) CreateServer(args automation.ServerArgs) (*automation.Resource
 	}
 
 	return &automation.ResourceResults{
-		ID:       server.ID,
-		Name:     server.Hostname,
-		Region:   server.Metro.Code,
+		ID:       server.GetId(),
+		Name:     server.GetHostname(),
+		Region:   server.Metro.GetCode(),
 		PublicIP: getIP4(server),
-		Tags:     strings.Join(server.Tags, ","),
+		Tags:     strings.Join(server.GetTags(), ","),
 	}, err
 }
 
 func (e *Equinix) DeleteServer(id string, args automation.ServerArgs) error {
-	keys, _, err := e.client.SSHKeys.ProjectList(e.project)
+	ctx := context.Background()
+	keys, _, err := e.client.SSHKeysApi.FindProjectSSHKeys(ctx, e.project).Query(fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName())).Execute()
 	if err != nil {
 		return err
 	}
-	for _, key := range keys {
-		if key.Label == fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()) {
-			_, err := e.client.SSHKeys.Delete(key.ID)
-			if err != nil {
-				return err
-			}
+	for _, key := range keys.SshKeys {
+		_, err := e.client.SSHKeysApi.DeleteSSHKey(ctx, key.GetId()).Execute()
+		if err != nil {
+			return err
 		}
-	}
-	instances, _, err := e.client.Devices.List(e.project, &packngo.ListOptions{
-		Search: args.MinecraftResource.GetName(),
-	})
-	if err != nil {
-		return err
-	}
-	for _, instance := range instances {
-		if instance.Hostname == args.MinecraftResource.GetName() {
-			_, err = e.client.Devices.Delete(instance.ID, true)
-			if err != nil {
-				return err
-			}
-		}
-	}
 
+	}
+	_, err = e.client.DevicesApi.DeleteDevice(ctx, id).ForceDelete(true).Execute()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (e *Equinix) ListServer() ([]automation.ResourceResults, error) {
-	list, _, err := e.client.Devices.List(e.project, &packngo.ListOptions{
-		Search: common.InstanceTag,
-	})
+	ctx := context.Background()
+	list, _, err := e.client.DevicesApi.FindProjectDevices(ctx, e.project).Search(common.InstanceTag).Execute()
+
 	if err != nil {
 		return nil, err
 	}
 	var result []automation.ResourceResults
-	for i, server := range list {
+	for _, server := range list.Devices {
 		result = append(result, automation.ResourceResults{
-			ID:       server.ID,
-			Name:     server.Hostname,
-			Region:   server.Metro.Code,
-			PublicIP: getIP4(&list[i]),
-			Tags:     strings.Join(server.Tags, ","),
+			ID:       server.GetId(),
+			Name:     server.GetHostname(),
+			Region:   server.Metro.GetCode(),
+			PublicIP: getIP4(&server),
+			Tags:     strings.Join(server.GetTags(), ","),
 		})
 	}
 	return result, nil
 }
 
 func (e *Equinix) UpdateServer(id string, args automation.ServerArgs) error {
-	instance, _, err := e.client.Devices.Get(id, nil)
+	ctx := context.Background()
+	instance, _, err := e.client.DevicesApi.FindDeviceById(ctx, id).Execute()
 	if err != nil {
 		return err
 	}
@@ -156,11 +148,11 @@ func (e *Equinix) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
-func getIP4(server *packngo.Device) string {
+func getIP4(server *metal.Device) string {
 	ip4 := ""
-	for _, network := range server.Network {
-		if network.Public {
-			ip4 = network.IpAddressCommon.Address
+	for _, network := range server.GetIpAddresses() {
+		if network.GetPublic() {
+			ip4 = network.GetAddress()
 			break
 		}
 	}
@@ -168,7 +160,8 @@ func getIP4(server *packngo.Device) string {
 }
 
 func (e *Equinix) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
-	instance, _, err := e.client.Devices.Get(id, nil)
+	ctx := context.Background()
+	instance, _, err := e.client.DevicesApi.FindDeviceById(ctx, id).Execute()
 	if err != nil {
 		return err
 	}
@@ -186,16 +179,17 @@ func (e *Equinix) UploadPlugin(id string, args automation.ServerArgs, plugin, de
 }
 
 func (e *Equinix) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
-	instance, _, err := e.client.Devices.Get(id, nil)
+	ctx := context.Background()
+	instance, _, err := e.client.DevicesApi.FindDeviceById(ctx, id).Execute()
 	if err != nil {
 		return nil, err
 	}
 
 	return &automation.ResourceResults{
-		ID:       instance.ID,
-		Name:     instance.Hostname,
-		Region:   instance.Metro.Code,
+		ID:       instance.GetId(),
+		Name:     instance.GetHostname(),
+		Region:   instance.Metro.GetCode(),
 		PublicIP: getIP4(instance),
-		Tags:     strings.Join(instance.Tags, ","),
+		Tags:     strings.Join(instance.GetTags(), ","),
 	}, err
 }
