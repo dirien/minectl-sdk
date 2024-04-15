@@ -29,7 +29,7 @@ require (
 	github.com/melbahja/goph v1.4.0
 	github.com/oracle/oci-go-sdk/v65 v65.63.1
 	github.com/pkg/errors v0.9.1
-	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.25
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.26
 	github.com/sethvargo/go-password v0.2.0
 	github.com/stretchr/testify v1.9.0
 	github.com/vultr/govultr/v3 v3.6.4
