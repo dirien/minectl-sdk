@@ -1,6 +1,6 @@
 module github.com/dirien/minectl-sdk
 
-go 1.21
+go 1.22
 
 toolchain go1.22.2
 
@@ -23,14 +23,14 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gophercloud/gophercloud v1.11.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
-	github.com/hetznercloud/hcloud-go/v2 v2.7.0
+	github.com/hetznercloud/hcloud-go/v2 v2.7.1
 	github.com/ionos-cloud/sdk-go/v6 v6.1.11
 	github.com/linode/linodego v1.32.0
 	github.com/melbahja/goph v1.4.0
 	github.com/oracle/oci-go-sdk/v65 v65.63.2
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.26
-	github.com/sethvargo/go-password v0.2.0
+	github.com/sethvargo/go-password v0.3.0
 	github.com/stretchr/testify v1.9.0
 	github.com/vultr/govultr/v3 v3.6.4
 	go.uber.org/zap v1.27.0
@@ -109,7 +109,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/mod v0.16.0 // indirect
-	golang.org/x/net v0.22.0 // indirect
+	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
