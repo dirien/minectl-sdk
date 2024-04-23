@@ -7,7 +7,7 @@ toolchain go1.22.2
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.11.1
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.5.2
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5 v5.6.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5 v5.7.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v5 v5.1.1
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.2.0
 	github.com/Masterminds/sprig/v3 v3.2.3
@@ -25,7 +25,7 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hetznercloud/hcloud-go/v2 v2.7.2
 	github.com/ionos-cloud/sdk-go/v6 v6.1.11
-	github.com/linode/linodego v1.32.0
+	github.com/linode/linodego v1.33.0
 	github.com/melbahja/goph v1.4.0
 	github.com/oracle/oci-go-sdk/v65 v65.63.2
 	github.com/pkg/errors v0.9.1
@@ -36,14 +36,14 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.22.0
 	golang.org/x/oauth2 v0.19.0
-	google.golang.org/api v0.175.0
+	google.golang.org/api v0.176.0
 )
 
 require (
 	cloud.google.com/go/auth v0.2.2 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.1 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/internal v1.5.2 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/internal v1.6.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
