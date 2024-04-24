@@ -13,8 +13,8 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.26.1
 	github.com/aws/aws-sdk-go-v2/config v1.27.11
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.157.0
-	github.com/civo/civogo v0.3.68
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.158.0
+	github.com/civo/civogo v0.3.69
 	github.com/digitalocean/godo v1.113.0
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/equinix/equinix-sdk-go v0.36.0
@@ -27,7 +27,7 @@ require (
 	github.com/ionos-cloud/sdk-go/v6 v6.1.11
 	github.com/linode/linodego v1.33.0
 	github.com/melbahja/goph v1.4.0
-	github.com/oracle/oci-go-sdk/v65 v65.63.2
+	github.com/oracle/oci-go-sdk/v65 v65.64.0
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.26
 	github.com/sethvargo/go-password v0.3.0
@@ -36,12 +36,12 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.22.0
 	golang.org/x/oauth2 v0.19.0
-	google.golang.org/api v0.176.0
+	google.golang.org/api v0.176.1
 )
 
 require (
-	cloud.google.com/go/auth v0.2.2 // indirect
-	cloud.google.com/go/auth/oauth2adapt v0.2.1 // indirect
+	cloud.google.com/go/auth v0.3.0 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.6.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
