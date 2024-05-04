@@ -35,7 +35,7 @@ require (
 	github.com/vultr/govultr/v3 v3.6.4
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.22.0
-	golang.org/x/oauth2 v0.19.0
+	golang.org/x/oauth2 v0.20.0
 	google.golang.org/api v0.177.0
 )
 
