@@ -19,7 +19,7 @@ require (
 	github.com/dirien/ovh-go-sdk v0.2.0
 	github.com/equinix/equinix-sdk-go v0.39.1
 	github.com/exoscale/egoscale v0.101.1
-	github.com/fatih/color v1.16.0
+	github.com/fatih/color v1.17.0
 	github.com/google/uuid v1.6.0
 	github.com/gophercloud/gophercloud v1.11.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
