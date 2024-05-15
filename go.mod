@@ -27,7 +27,7 @@ require (
 	github.com/ionos-cloud/sdk-go/v6 v6.1.11
 	github.com/linode/linodego v1.33.1
 	github.com/melbahja/goph v1.4.0
-	github.com/oracle/oci-go-sdk/v65 v65.65.1
+	github.com/oracle/oci-go-sdk/v65 v65.65.2
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.26
 	github.com/sethvargo/go-password v0.3.0
