@@ -25,9 +25,9 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hetznercloud/hcloud-go/v2 v2.8.0
 	github.com/ionos-cloud/sdk-go/v6 v6.1.11
-	github.com/linode/linodego v1.33.1
+	github.com/linode/linodego v1.34.0
 	github.com/melbahja/goph v1.4.0
-	github.com/oracle/oci-go-sdk/v65 v65.65.2
+	github.com/oracle/oci-go-sdk/v65 v65.65.3
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.26
 	github.com/sethvargo/go-password v0.3.0
@@ -65,7 +65,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-resty/resty/v2 v2.12.0 // indirect
+	github.com/go-resty/resty/v2 v2.13.1 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
