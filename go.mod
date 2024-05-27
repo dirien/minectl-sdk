@@ -21,7 +21,7 @@ require (
 	github.com/exoscale/egoscale v0.101.1
 	github.com/fatih/color v1.17.0
 	github.com/google/uuid v1.6.0
-	github.com/gophercloud/gophercloud v1.11.0
+	github.com/gophercloud/gophercloud v1.12.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hetznercloud/hcloud-go/v2 v2.8.0
 	github.com/ionos-cloud/sdk-go/v6 v6.1.11
@@ -29,7 +29,7 @@ require (
 	github.com/melbahja/goph v1.4.0
 	github.com/oracle/oci-go-sdk/v65 v65.65.3
 	github.com/pkg/errors v0.9.1
-	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.26
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.27
 	github.com/sethvargo/go-password v0.3.0
 	github.com/stretchr/testify v1.9.0
 	github.com/vultr/govultr/v3 v3.6.4
