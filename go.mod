@@ -13,7 +13,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/aws/aws-sdk-go-v2 v1.27.2
 	github.com/aws/aws-sdk-go-v2/config v1.27.18
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.163.1
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.164.0
 	github.com/civo/civogo v0.3.70
 	github.com/digitalocean/godo v1.117.0
 	github.com/dirien/ovh-go-sdk v0.2.0
@@ -36,7 +36,7 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.24.0
 	golang.org/x/oauth2 v0.21.0
-	google.golang.org/api v0.183.0
+	google.golang.org/api v0.184.0
 )
 
 require (
@@ -113,7 +113,7 @@ require (
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240604185151-ef581f913117 // indirect
 	google.golang.org/grpc v1.64.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
