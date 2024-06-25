@@ -30,7 +30,7 @@ require (
 	github.com/oracle/oci-go-sdk/v65 v65.67.2
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.28
-	github.com/sethvargo/go-password v0.3.0
+	github.com/sethvargo/go-password v0.3.1
 	github.com/stretchr/testify v1.9.0
 	github.com/vultr/govultr/v3 v3.8.1
 	go.uber.org/zap v1.27.0
