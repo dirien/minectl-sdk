@@ -11,13 +11,13 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v6 v6.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.2.0
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/aws/aws-sdk-go-v2 v1.36.1
-	github.com/aws/aws-sdk-go-v2/config v1.29.6
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.203.0
+	github.com/aws/aws-sdk-go-v2 v1.36.2
+	github.com/aws/aws-sdk-go-v2/config v1.29.7
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.203.1
 	github.com/civo/civogo v0.3.94
-	github.com/digitalocean/godo v1.137.0
+	github.com/digitalocean/godo v1.138.0
 	github.com/dirien/ovh-go-sdk v0.2.0
-	github.com/equinix/equinix-sdk-go v0.48.0
+	github.com/equinix/equinix-sdk-go v0.49.0
 	github.com/exoscale/egoscale v0.101.1
 	github.com/fatih/color v1.18.0
 	github.com/google/uuid v1.6.0
@@ -27,7 +27,7 @@ require (
 	github.com/ionos-cloud/sdk-go/v6 v6.3.2
 	github.com/linode/linodego v1.47.0
 	github.com/melbahja/goph v1.4.0
-	github.com/oracle/oci-go-sdk/v65 v65.83.1
+	github.com/oracle/oci-go-sdk/v65 v65.83.2
 	github.com/pkg/errors v0.9.1
 	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.32
 	github.com/sethvargo/go-password v0.3.1
@@ -36,7 +36,7 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.33.0
 	golang.org/x/oauth2 v0.26.0
-	google.golang.org/api v0.221.0
+	google.golang.org/api v0.222.0
 )
 
 require (
