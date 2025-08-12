@@ -2,41 +2,41 @@ module github.com/dirien/minectl-sdk
 
 go 1.22
 
-toolchain go1.24.0
+toolchain go1.24.6
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.17.0
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.8.2
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v6 v6.3.0
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v6 v6.2.0
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.2.0
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.18.2
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.11.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v7 v7.0.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v7 v7.0.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources/v3 v3.0.0
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/aws/aws-sdk-go-v2 v1.36.1
-	github.com/aws/aws-sdk-go-v2/config v1.29.6
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.203.0
-	github.com/civo/civogo v0.3.94
-	github.com/digitalocean/godo v1.137.0
+	github.com/aws/aws-sdk-go-v2 v1.38.0
+	github.com/aws/aws-sdk-go-v2/config v1.31.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.242.0
+	github.com/civo/civogo v0.6.4
+	github.com/digitalocean/godo v1.162.0
 	github.com/dirien/ovh-go-sdk v0.2.0
-	github.com/equinix/equinix-sdk-go v0.48.0
+	github.com/equinix/equinix-sdk-go v0.55.0
 	github.com/exoscale/egoscale v0.101.1
 	github.com/fatih/color v1.18.0
 	github.com/google/uuid v1.6.0
-	github.com/gophercloud/gophercloud/v2 v2.5.0
+	github.com/gophercloud/gophercloud/v2 v2.7.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
-	github.com/hetznercloud/hcloud-go/v2 v2.19.1
-	github.com/ionos-cloud/sdk-go/v6 v6.3.2
-	github.com/linode/linodego v1.47.0
+	github.com/hetznercloud/hcloud-go/v2 v2.22.0
+	github.com/ionos-cloud/sdk-go/v6 v6.3.4
+	github.com/linode/linodego v1.54.0
 	github.com/melbahja/goph v1.4.0
-	github.com/oracle/oci-go-sdk/v65 v65.83.1
+	github.com/oracle/oci-go-sdk/v65 v65.97.1
 	github.com/pkg/errors v0.9.1
-	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.32
+	github.com/scaleway/scaleway-sdk-go v1.0.0-beta.34
 	github.com/sethvargo/go-password v0.3.1
 	github.com/stretchr/testify v1.10.0
-	github.com/vultr/govultr/v3 v3.14.1
+	github.com/vultr/govultr/v3 v3.22.1
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.33.0
-	golang.org/x/oauth2 v0.26.0
-	google.golang.org/api v0.221.0
+	golang.org/x/crypto v0.41.0
+	golang.org/x/oauth2 v0.30.0
+	google.golang.org/api v0.246.0
 )
 
 require (
