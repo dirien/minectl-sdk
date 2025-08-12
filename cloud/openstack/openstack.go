@@ -1,6 +1,7 @@
 package openstack
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"os"
@@ -13,18 +14,18 @@ import (
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
-	"github.com/gophercloud/gophercloud"
-	"github.com/gophercloud/gophercloud/openstack"
-	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/floatingips"
-	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/keypairs"
-	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/secgroups"
-	flavors2 "github.com/gophercloud/gophercloud/openstack/compute/v2/flavors"
-	"github.com/gophercloud/gophercloud/openstack/compute/v2/images"
-	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
-	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/layer3/routers"
-	"github.com/gophercloud/gophercloud/openstack/networking/v2/networks"
-	"github.com/gophercloud/gophercloud/openstack/networking/v2/subnets"
-	"github.com/gophercloud/gophercloud/pagination"
+	"github.com/gophercloud/gophercloud/v2"
+	"github.com/gophercloud/gophercloud/v2/openstack"
+	"github.com/gophercloud/gophercloud/v2/openstack/compute/v2/keypairs"
+	"github.com/gophercloud/gophercloud/v2/openstack/compute/v2/secgroups"
+	flavors2 "github.com/gophercloud/gophercloud/v2/openstack/compute/v2/flavors"
+	"github.com/gophercloud/gophercloud/v2/openstack/compute/v2/servers"
+	"github.com/gophercloud/gophercloud/v2/openstack/image/v2/images"
+	"github.com/gophercloud/gophercloud/v2/openstack/networking/v2/extensions/layer3/floatingips"
+	"github.com/gophercloud/gophercloud/v2/openstack/networking/v2/extensions/layer3/routers"
+	"github.com/gophercloud/gophercloud/v2/openstack/networking/v2/networks"
+	"github.com/gophercloud/gophercloud/v2/openstack/networking/v2/subnets"
+	"github.com/gophercloud/gophercloud/v2/pagination"
 	"go.uber.org/zap"
 )
 
@@ -32,6 +33,7 @@ type OpenStack struct {
 	tmpl          *minctlTemplate.Template
 	computeClient *gophercloud.ServiceClient
 	networkClient *gophercloud.ServiceClient
+	imageClient   *gophercloud.ServiceClient
 	region        string
 	imageName     string
 }
@@ -77,7 +79,8 @@ func NewOpenStack(imageName string) (*OpenStack, error) {
 	if err != nil {
 		return nil, err
 	}
-	provider, err := openstack.AuthenticatedClient(opts)
+	ctx := context.Background()
+	provider, err := openstack.AuthenticatedClient(ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -93,10 +96,17 @@ func NewOpenStack(imageName string) (*OpenStack, error) {
 	if err != nil {
 		return nil, err
 	}
+	imageClient, err := openstack.NewImageV2(provider, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+	if err != nil {
+		return nil, err
+	}
 	return &OpenStack{
 		tmpl:          tmpl,
 		computeClient: computeClient,
 		networkClient: networkClient,
+		imageClient:   imageClient,
 		region:        os.Getenv("OS_REGION_NAME"),
 		imageName:     imageName,
 	}, nil
@@ -104,12 +114,13 @@ func NewOpenStack(imageName string) (*OpenStack, error) {
 
 // CreateServer TODO: https://github.com/dirien/minectl/issues/299
 func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) { //nolint: gocyclo
+	ctx := context.Background()
 	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
 		return nil, err
 	}
 
-	keyPair, err := keypairs.Create(o.computeClient, keypairs.CreateOpts{
+	keyPair, err := keypairs.Create(ctx, o.computeClient, keypairs.CreateOpts{
 		Name:      fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()),
 		PublicKey: *publicKey,
 	}).Extract()
@@ -118,12 +129,12 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 	}
 
 	listOpts := images.ListOpts{
-		Status: "active",
+		Status: images.ImageStatusActive,
 	}
 
 	var image images.Image
-	pager := images.ListDetail(o.computeClient, listOpts)
-	err = pager.EachPage(func(page pagination.Page) (bool, error) {
+	pager := images.List(o.imageClient, listOpts)
+	err = pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
 		imageList, err := images.ExtractImages(page)
 		if err != nil {
 			return false, err
@@ -143,7 +154,7 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 	var flavor flavors2.Flavor
 
 	flavorPager := flavors2.ListDetail(o.computeClient, flavors2.ListOpts{})
-	err = flavorPager.EachPage(func(page pagination.Page) (bool, error) {
+	err = flavorPager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
 		flavorsList, err := flavors2.ExtractFlavors(page)
 		if err != nil {
 			return false, err
@@ -164,7 +175,7 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 		Description: "minectl",
 	}
 
-	group, err := secgroups.Create(o.computeClient, createOpts).Extract()
+	group, err := secgroups.Create(ctx, o.computeClient, createOpts).Extract()
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +208,7 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 		AdminStateUp: &adminStateUp,
 	}
 
-	network, err := networks.Create(o.networkClient, networkOpts).Extract()
+	network, err := networks.Create(ctx, o.networkClient, networkOpts).Extract()
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +224,7 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 		},
 	}
 
-	subnet, err := subnets.Create(o.networkClient, subnetOpts).Extract()
+	subnet, err := subnets.Create(ctx, o.networkClient, subnetOpts).Extract()
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +233,7 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 		Name: "public",
 	})
 	var publicNetwork networks.Network
-	err = networkPager.EachPage(func(page pagination.Page) (bool, error) {
+	err = networkPager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
 		networkList, err := networks.ExtractNetworks(page)
 		if err != nil {
 			return false, err
@@ -241,7 +252,7 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 		NetworkID: publicNetwork.ID,
 	}
 
-	router, err := routers.Create(o.networkClient, routers.CreateOpts{
+	router, err := routers.Create(ctx, o.networkClient, routers.CreateOpts{
 		Name:         fmt.Sprintf("%s-router", args.MinecraftResource.GetName()),
 		AdminStateUp: &adminStateUp,
 		GatewayInfo:  gatewayInfo,
@@ -249,15 +260,18 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 	if err != nil {
 		return nil, err
 	}
-	routers.AddInterface(o.networkClient, router.ID, &routers.AddInterfaceOpts{
+	_, err = routers.AddInterface(ctx, o.networkClient, router.ID, routers.AddInterfaceOpts{
 		SubnetID: subnet.ID,
-	})
+	}).Extract()
+	if err != nil {
+		return nil, err
+	}
 	userData, err := o.tmpl.GetTemplate(args.MinecraftResource, &minctlTemplate.CreateUpdateTemplateArgs{Name: minctlTemplate.GetTemplateCloudConfigName(args.MinecraftResource.IsProxyServer())})
 	if err != nil {
 		return nil, err
 	}
 
-	server, err := servers.Create(o.computeClient, keypairs.CreateOptsExt{
+	server, err := servers.Create(ctx, o.computeClient, keypairs.CreateOptsExt{
 		CreateOptsBuilder: servers.CreateOpts{
 			Name: args.MinecraftResource.GetName(),
 			SecurityGroups: []string{
@@ -274,14 +288,14 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 			UserData: []byte(base64.StdEncoding.EncodeToString([]byte(userData))),
 		},
 		KeyName: keyPair.Name,
-	}).Extract()
+	}, nil).Extract()
 	if err != nil {
 		return nil, err
 	}
 
 	stillCreating := true
 	for stillCreating {
-		server, err = servers.Get(o.computeClient, server.ID).Extract()
+		server, err = servers.Get(ctx, o.computeClient, server.ID).Extract()
 		if err != nil {
 			return nil, err
 		}
@@ -292,18 +306,42 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 		}
 	}
 
-	floatingIP, err := floatingips.Create(o.computeClient, floatingips.CreateOpts{
-		Pool: "public",
+	floatingIP, err := floatingips.Create(ctx, o.networkClient, floatingips.CreateOpts{
+		FloatingNetworkID: publicNetwork.ID,
 	}).Extract()
 	if err != nil {
 		return nil, err
 	}
 
-	associateOpts := floatingips.AssociateOpts{
-		FloatingIP: floatingIP.IP,
+	// Get the first port ID from the server addresses
+	var portID string
+	for _, addresses := range server.Addresses {
+		addrs, ok := addresses.([]interface{})
+		if !ok {
+			continue
+		}
+		for _, addr := range addrs {
+			addrMap, ok := addr.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			if pid, ok := addrMap["OS-EXT-IPS:port_id"].(string); ok {
+				portID = pid
+				break
+			}
+		}
+		if portID != "" {
+			break
+		}
 	}
 
-	err = floatingips.AssociateInstance(o.computeClient, server.ID, associateOpts).ExtractErr()
+	if portID == "" {
+		return nil, fmt.Errorf("could not find port ID for server %s", server.ID)
+	}
+
+	_, err = floatingips.Update(ctx, o.networkClient, floatingIP.ID, floatingips.UpdateOpts{
+		PortID: &portID,
+	}).Extract()
 	if err != nil {
 		return nil, err
 	}
@@ -312,12 +350,13 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 		ID:       server.ID,
 		Name:     server.Name,
 		Region:   o.region,
-		PublicIP: floatingIP.IP,
+		PublicIP: floatingIP.FloatingIP,
 		Tags:     strings.Join(getTagKeys(server.Metadata), ","),
 	}, err
 }
 
 func (o *OpenStack) createSecurityGroup(group *secgroups.SecurityGroup, port int, protocol string) error {
+	ctx := context.Background()
 	ssh := secgroups.CreateRuleOpts{
 		ParentGroupID: group.ID,
 		FromPort:      port,
@@ -326,7 +365,7 @@ func (o *OpenStack) createSecurityGroup(group *secgroups.SecurityGroup, port int
 		CIDR:          "0.0.0.0/0",
 	}
 
-	_, err := secgroups.CreateRule(o.computeClient, ssh).Extract()
+	_, err := secgroups.CreateRule(ctx, o.computeClient, ssh).Extract()
 	if err != nil {
 		return err
 	}
@@ -334,11 +373,12 @@ func (o *OpenStack) createSecurityGroup(group *secgroups.SecurityGroup, port int
 }
 
 func (o *OpenStack) DeleteServer(id string, args automation.ServerArgs) error {
-	server, err := servers.Get(o.computeClient, id).Extract()
+	ctx := context.Background()
+	server, err := servers.Get(ctx, o.computeClient, id).Extract()
 	if err != nil {
 		return err
 	}
-	err = keypairs.Delete(o.computeClient, fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()), &keypairs.DeleteOpts{}).Err
+	err = keypairs.Delete(ctx, o.computeClient, fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()), &keypairs.DeleteOpts{}).ExtractErr()
 	if err != nil {
 		return err
 	}
@@ -346,21 +386,26 @@ func (o *OpenStack) DeleteServer(id string, args automation.ServerArgs) error {
 	if err != nil {
 		return err
 	}
-	floatingips.DisassociateInstance(o.computeClient, id, floatingips.DisassociateOpts{
-		FloatingIP: floatingIP.IP,
-	})
-	err = floatingips.Delete(o.computeClient, floatingIP.ID).Err
+	// Disassociate floating IP by updating it with nil port ID
+	var nilPortID *string
+	_, err = floatingips.Update(ctx, o.networkClient, floatingIP.ID, floatingips.UpdateOpts{
+		PortID: nilPortID,
+	}).Extract()
+	if err != nil {
+		return err
+	}
+	err = floatingips.Delete(ctx, o.networkClient, floatingIP.ID).ExtractErr()
 	if err != nil {
 		return err
 	}
 
-	err = servers.Delete(o.computeClient, server.ID).Err
+	err = servers.Delete(ctx, o.computeClient, server.ID).ExtractErr()
 	if err != nil {
 		return err
 	}
 	stillCreating := true
 	for stillCreating {
-		server, err = servers.Get(o.computeClient, server.ID).Extract()
+		server, err = servers.Get(ctx, o.computeClient, server.ID).Extract()
 		if err != nil {
 			stillCreating = false
 		}
@@ -384,7 +429,7 @@ func (o *OpenStack) DeleteServer(id string, args automation.ServerArgs) error {
 	if err != nil {
 		return err
 	}
-	err = secgroups.Delete(o.computeClient, securityGroup.ID).Err
+	err = secgroups.Delete(ctx, o.computeClient, securityGroup.ID).ExtractErr()
 	if err != nil {
 		return err
 	}
@@ -392,21 +437,21 @@ func (o *OpenStack) DeleteServer(id string, args automation.ServerArgs) error {
 	if err != nil {
 		return err
 	}
-	_, err = routers.RemoveInterface(o.networkClient, router.ID, routers.RemoveInterfaceOpts{
+	_, err = routers.RemoveInterface(ctx, o.networkClient, router.ID, routers.RemoveInterfaceOpts{
 		SubnetID: subnet.ID,
 	}).Extract()
 	if err != nil {
 		return err
 	}
-	err = routers.Delete(o.networkClient, router.ID).Err
+	err = routers.Delete(ctx, o.networkClient, router.ID).ExtractErr()
 	if err != nil {
 		return err
 	}
-	err = subnets.Delete(o.networkClient, subnet.ID).Err
+	err = subnets.Delete(ctx, o.networkClient, subnet.ID).ExtractErr()
 	if err != nil {
 		return err
 	}
-	err = networks.Delete(o.networkClient, network.ID).Err
+	err = networks.Delete(ctx, o.networkClient, network.ID).ExtractErr()
 	if err != nil {
 		return err
 	}
@@ -414,11 +459,12 @@ func (o *OpenStack) DeleteServer(id string, args automation.ServerArgs) error {
 }
 
 func (o *OpenStack) getRouterByName(args automation.ServerArgs) (*routers.Router, error) {
+	ctx := context.Background()
 	var router *routers.Router
 	pager := routers.List(o.networkClient, routers.ListOpts{
 		Name: fmt.Sprintf("%s-router", args.MinecraftResource.GetName()),
 	})
-	err := pager.EachPage(func(page pagination.Page) (bool, error) {
+	err := pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
 		routerList, err := routers.ExtractRouters(page)
 		if err != nil {
 			return false, err
@@ -437,16 +483,50 @@ func (o *OpenStack) getRouterByName(args automation.ServerArgs) (*routers.Router
 	return router, nil
 }
 
-func (o *OpenStack) getFloatingIPByInstanceID(id string) (*floatingips.FloatingIP, error) {
+func (o *OpenStack) getFloatingIPByInstanceID(serverID string) (*floatingips.FloatingIP, error) {
+	ctx := context.Background()
+	
+	// First get the server to find its port ID
+	server, err := servers.Get(ctx, o.computeClient, serverID).Extract()
+	if err != nil {
+		return nil, err
+	}
+	
+	// Get the first port ID from the server addresses
+	var portID string
+	for _, addresses := range server.Addresses {
+		addrs, ok := addresses.([]interface{})
+		if !ok {
+			continue
+		}
+		for _, addr := range addrs {
+			addrMap, ok := addr.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			if pid, ok := addrMap["OS-EXT-IPS:port_id"].(string); ok {
+				portID = pid
+				break
+			}
+		}
+		if portID != "" {
+			break
+		}
+	}
+	
+	if portID == "" {
+		return nil, fmt.Errorf("could not find port ID for server %s", serverID)
+	}
+	
 	var floatingIP *floatingips.FloatingIP
-	pager := floatingips.List(o.computeClient)
-	err := pager.EachPage(func(page pagination.Page) (bool, error) {
+	pager := floatingips.List(o.networkClient, floatingips.ListOpts{})
+	err = pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
 		list, err := floatingips.ExtractFloatingIPs(page)
 		if err != nil {
 			return false, err
 		}
 		for i, item := range list {
-			if item.InstanceID == id {
+			if item.PortID == portID {
 				floatingIP = &list[i]
 				break
 			}
@@ -460,9 +540,10 @@ func (o *OpenStack) getFloatingIPByInstanceID(id string) (*floatingips.FloatingI
 }
 
 func (o *OpenStack) getSecurityGroupByName(args automation.ServerArgs) (*secgroups.SecurityGroup, error) {
+	ctx := context.Background()
 	var securityGroup *secgroups.SecurityGroup
 	pager := secgroups.List(o.computeClient)
-	err := pager.EachPage(func(page pagination.Page) (bool, error) {
+	err := pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
 		list, err := secgroups.ExtractSecurityGroups(page)
 		if err != nil {
 			return false, err
@@ -482,11 +563,12 @@ func (o *OpenStack) getSecurityGroupByName(args automation.ServerArgs) (*secgrou
 }
 
 func (o *OpenStack) getSubNetByName(args automation.ServerArgs) (*subnets.Subnet, error) {
+	ctx := context.Background()
 	var subnet *subnets.Subnet
 	pager := subnets.List(o.networkClient, subnets.ListOpts{
 		Name: fmt.Sprintf("%s-subnet", args.MinecraftResource.GetName()),
 	})
-	err := pager.EachPage(func(page pagination.Page) (bool, error) {
+	err := pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
 		list, err := subnets.ExtractSubnets(page)
 		if err != nil {
 			return false, err
@@ -506,11 +588,12 @@ func (o *OpenStack) getSubNetByName(args automation.ServerArgs) (*subnets.Subnet
 }
 
 func (o *OpenStack) getNetworkByName(args automation.ServerArgs) (*networks.Network, error) {
+	ctx := context.Background()
 	var network *networks.Network
 	pager := networks.List(o.networkClient, networks.ListOpts{
 		Name: fmt.Sprintf("%s-net", args.MinecraftResource.GetName()),
 	})
-	err := pager.EachPage(func(page pagination.Page) (bool, error) {
+	err := pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
 		list, err := networks.ExtractNetworks(page)
 		if err != nil {
 			return false, err
@@ -530,9 +613,10 @@ func (o *OpenStack) getNetworkByName(args automation.ServerArgs) (*networks.Netw
 }
 
 func (o *OpenStack) ListServer() ([]automation.ResourceResults, error) {
+	ctx := context.Background()
 	var result []automation.ResourceResults
 	pager := servers.List(o.computeClient, servers.ListOpts{})
-	err := pager.EachPage(func(page pagination.Page) (bool, error) {
+	err := pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
 		list, err := servers.ExtractServers(page)
 		if err != nil {
 			return false, err
@@ -548,7 +632,7 @@ func (o *OpenStack) ListServer() ([]automation.ResourceResults, error) {
 						ID:       i.ID,
 						Name:     i.Name,
 						Region:   o.region,
-						PublicIP: floatingIP.IP,
+						PublicIP: floatingIP.FloatingIP,
 						Tags:     strings.Join(getTagKeys(i.Metadata), ","),
 					})
 				}
@@ -598,7 +682,8 @@ func (o *OpenStack) UploadPlugin(id string, args automation.ServerArgs, plugin, 
 }
 
 func (o *OpenStack) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
-	server, err := servers.Get(o.computeClient, id).Extract()
+	ctx := context.Background()
+	server, err := servers.Get(ctx, o.computeClient, id).Extract()
 	if err != nil {
 		return nil, err
 	}
@@ -610,7 +695,7 @@ func (o *OpenStack) GetServer(id string, args automation.ServerArgs) (*automatio
 		ID:       server.ID,
 		Name:     server.Name,
 		Region:   o.region,
-		PublicIP: floatingIP.IP,
+		PublicIP: floatingIP.FloatingIP,
 		Tags:     strings.Join(getTagKeys(server.Metadata), ","),
 	}, nil
 }
