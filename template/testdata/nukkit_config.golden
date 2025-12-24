@@ -1,0 +1,35 @@
+apiVersion: minectl.ediri.io/v1alpha1
+kind: MinecraftServer
+metadata:
+  name: minecraft
+spec:
+  monitoring:
+    enabled: true
+  server:
+    cloud: do
+    region: xxx
+    size: xxx
+    ssh:
+      port: 
+      publickeyfile: xxx
+      fail2ban:
+        bantime: 
+        maxretry: 
+    port: 19132
+  minecraft:
+    java:
+      openjdk: 8
+      xmx: 2G
+      xms: 2G
+      rcon:
+        password: xxx
+        port: 25575
+        enabled: true
+        broadcast: true
+    edition: nukkit
+    version: xx
+    eula: true
+    properties: |
+      level-seed=minectlrocks
+      view-distance=10
+      enable-jmx-monitoring=false
