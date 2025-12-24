@@ -11,15 +11,16 @@ import (
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
-	account "github.com/scaleway/scaleway-sdk-go/api/account/v2alpha1"
+	"github.com/scaleway/scaleway-sdk-go/api/iam/v1alpha1"
 	"github.com/scaleway/scaleway-sdk-go/api/instance/v1"
 	"github.com/scaleway/scaleway-sdk-go/scw"
 )
 
 type Scaleway struct {
-	instanceAPI *instance.API
-	accountAPI  *account.API
-	tmpl        *minctlTemplate.Template
+	instanceAPI    *instance.API
+	iamAPI         *iam.API
+	organizationID string
+	tmpl           *minctlTemplate.Template
 }
 
 func NewScaleway(accessKey, secretKey, organizationID, region string) (*Scaleway, error) {
@@ -41,9 +42,10 @@ func NewScaleway(accessKey, secretKey, organizationID, region string) (*Scaleway
 		return nil, err
 	}
 	return &Scaleway{
-		instanceAPI: instance.NewAPI(client),
-		accountAPI:  account.NewAPI(client),
-		tmpl:        tmpl,
+		instanceAPI:    instance.NewAPI(client),
+		iamAPI:         iam.NewAPI(client),
+		organizationID: organizationID,
+		tmpl:           tmpl,
 	}, nil
 }
 
@@ -52,9 +54,10 @@ func (s *Scaleway) CreateServer(args automation.ServerArgs) (*automation.Resourc
 	if err != nil {
 		return nil, err
 	}
-	_, err = s.accountAPI.CreateSSHKey(&account.CreateSSHKeyRequest{
+	_, err = s.iamAPI.CreateSSHKey(&iam.CreateSSHKeyRequest{
 		Name:      fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()),
 		PublicKey: *publicKey,
+		ProjectID: s.organizationID,
 	})
 	if err != nil {
 		return nil, err
@@ -62,7 +65,7 @@ func (s *Scaleway) CreateServer(args automation.ServerArgs) (*automation.Resourc
 	server, err := s.instanceAPI.CreateServer(&instance.CreateServerRequest{
 		Name:              args.MinecraftResource.GetName(),
 		CommercialType:    args.MinecraftResource.GetSize(),
-		Image:             "ubuntu_jammy",
+		Image:             scw.StringPtr("ubuntu_jammy"),
 		Tags:              []string{"minectl"},
 		DynamicIPRequired: scw.BoolPtr(true),
 	})
@@ -158,14 +161,14 @@ func (s *Scaleway) DeleteServer(id string, args automation.ServerArgs) error {
 			return err
 		}
 	}
-	keys, err := s.accountAPI.ListSSHKeys(&account.ListSSHKeysRequest{
+	keys, err := s.iamAPI.ListSSHKeys(&iam.ListSSHKeysRequest{
 		Name: scw.StringPtr(fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName())),
 	})
 	if err != nil {
 		return err
 	}
 	for _, key := range keys.SSHKeys {
-		err := s.accountAPI.DeleteSSHKey(&account.DeleteSSHKeyRequest{
+		err := s.iamAPI.DeleteSSHKey(&iam.DeleteSSHKeyRequest{
 			SSHKeyID: key.ID,
 		})
 		if err != nil {
