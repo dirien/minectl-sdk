@@ -1,0 +1,24 @@
+apiVersion: minectl.ediri.io/v1alpha1
+kind: MinecraftServer
+metadata:
+  name: minecraft
+spec:
+  server:
+    cloud: do
+    region: xxx
+    size: xxx
+    ssh:
+      port: 
+      publickeyfile: xxx
+      fail2ban:
+        bantime: 
+        maxretry: 
+    port: 19132
+  minecraft:
+    edition: bedrock
+    version: xx
+    eula: true
+    properties: |
+      level-seed=minectlrocks
+      view-distance=10
+      enable-jmx-monitoring=false

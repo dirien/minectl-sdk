@@ -1,0 +1,179 @@
+#cloud-config
+users:
+  - default
+  - name: prometheus
+    shell: /bin/false
+  - name: node_exporter
+    shell: /bin/false
+  - name: minecraft_exporter
+    shell: /bin/false
+package_update: true
+
+packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - openjdk-16-jre-headless
+  - fail2ban
+fs_setup:
+  - label: minecraft
+    device: /dev/sda
+    filesystem: xfs
+    overwrite: false
+
+mounts:
+  - [/dev/sda, /minecraft]
+# Enable ipv4 forwarding, required on CIS hardened machines
+write_files:
+  - path: /etc/sysctl.d/enabled_ipv4_forwarding.conf
+    content: |
+      net.ipv4.conf.all.forwarding=1
+  - path: /tmp/server.properties
+    content: |
+       level-seed=minectlrocks
+       view-distance=10
+       enable-jmx-monitoring=false
+       broadcast-rcon-to-ops=true
+       rcon.port=2
+       enable-rcon=true
+       rcon.password=test
+       server-port=25565
+  - path: /tmp/prometheus.yml
+    content: |
+      global:
+        scrape_interval: 15s
+
+      scrape_configs:
+        - job_name: 'prometheus'
+          scrape_interval: 5s
+          static_configs:
+            - targets: ['localhost:9090']
+        - job_name: 'node_exporter'
+          scrape_interval: 5s
+          static_configs:
+            - targets: ['localhost:9100']
+        - job_name: 'minecraft_exporter'
+          scrape_interval: 1m
+          static_configs:
+            - targets: ['localhost:9150']
+  - path: /etc/systemd/system/prometheus.service
+    content: |
+      [Unit]
+      Description=Prometheus
+      Wants=network-online.target
+      After=network-online.target
+      [Service]
+      User=prometheus
+      Group=prometheus
+      Type=simple
+      ExecStart=/usr/local/bin/prometheus \
+          --config.file /etc/prometheus/prometheus.yml \
+          --storage.tsdb.path /var/lib/prometheus/ \
+          --web.console.templates=/etc/prometheus/consoles \
+          --web.console.libraries=/etc/prometheus/console_libraries
+      [Install]
+      WantedBy=multi-user.target
+  - path: /etc/systemd/system/node_exporter.service
+    content: |
+      [Unit]
+      Description=Node Exporter
+      Wants=network-online.target
+      After=network-online.target
+      [Service]
+      User=node_exporter
+      Group=node_exporter
+      Type=simple
+      ExecStart=/usr/local/bin/node_exporter
+      [Install]
+      WantedBy=multi-user.target
+  - path: /etc/systemd/system/minecraft-exporter.service
+    content: |
+      [Unit]
+      Description=Minecraft Exporter
+      Wants=network-online.target
+      After=network-online.target
+      [Service]
+      User=minecraft_exporter
+      Group=minecraft_exporter
+      Type=simple
+      ExecStart=/usr/local/bin/minecraft-exporter \
+          --mc.rcon-password=test
+      [Install]
+      WantedBy=multi-user.target
+  
+  - path: /etc/systemd/system/minecraft.service
+    content: |
+      [Unit]
+      Description=Minecraft Server
+      Documentation=https://www.minecraft.net/en-us/download/server
+      DefaultDependencies=no
+      After=network.target
+      [Service]
+      WorkingDirectory=/minecraft
+      Type=simple
+      ExecStart=/bin/sh -c "./run.sh"
+      Restart=on-failure
+      RestartSec=5
+      [Install]
+      WantedBy=multi-user.target
+  - path: /etc/fail2ban/jail.local
+    content: |
+      [sshd]
+      port = 0
+      enabled = true
+      maxretry = 0
+      bantime = 0
+      ignoreip = 
+
+runcmd:
+  - iptables -I INPUT -j ACCEPT
+  - export ARCH=amd64
+  - MACHINE_TYPE=$(uname -i)
+  - if test "$MACHINE_TYPE" = 'aarch64'; then export ARCH=arm64; fi
+  - export PROM_VERSION=2.40.3
+  - mkdir /etc/prometheus
+  - mkdir /var/lib/prometheus
+  - curl -sSL https://github.com/prometheus/prometheus/releases/download/v$PROM_VERSION/prometheus-$PROM_VERSION.linux-$ARCH.tar.gz | tar -xz
+  - cp prometheus-$PROM_VERSION.linux-$ARCH/prometheus /usr/local/bin/
+  - cp prometheus-$PROM_VERSION.linux-$ARCH/promtool /usr/local/bin/
+  - chown prometheus:prometheus /usr/local/bin/prometheus
+  - chown prometheus:prometheus /usr/local/bin/promtool
+  - cp -r prometheus-$PROM_VERSION.linux-$ARCH/consoles /etc/prometheus
+  - cp -r prometheus-$PROM_VERSION.linux-$ARCH/console_libraries /etc/prometheus
+  - chown -R prometheus:prometheus /var/lib/prometheus
+  - chown -R prometheus:prometheus /etc/prometheus/consoles
+  - chown -R prometheus:prometheus /etc/prometheus/console_libraries
+  - mv /tmp/prometheus.yml /etc/prometheus/prometheus.yml
+  - chown prometheus:prometheus /etc/prometheus/prometheus.yml
+  - systemctl daemon-reload
+  - systemctl start prometheus
+  - systemctl enable prometheus
+
+  - export NODE_EXPORTER_VERSION=1.4.0
+  - curl -sSL https://github.com/prometheus/node_exporter/releases/download/v$NODE_EXPORTER_VERSION/node_exporter-$NODE_EXPORTER_VERSION.linux-$ARCH.tar.gz | tar -xz
+  - cp node_exporter-$NODE_EXPORTER_VERSION.linux-$ARCH/node_exporter /usr/local/bin
+  - chown node_exporter:node_exporter /usr/local/bin/node_exporter
+  - systemctl daemon-reload
+  - systemctl start node_exporter
+  - systemctl enable node_exporter
+  - export MINECRAFT_EXPORTER_VERSION=0.17.1
+  - curl -sSL https://github.com/dirien/minecraft-prometheus-exporter/releases/download/v$MINECRAFT_EXPORTER_VERSION/minecraft-exporter_$MINECRAFT_EXPORTER_VERSION.linux-$ARCH.tar.gz | tar -xz
+  - cp minecraft-exporter /usr/local/bin
+  - chown minecraft_exporter:minecraft_exporter /usr/local/bin/minecraft-exporter
+  - systemctl start minecraft-exporter.service
+  - systemctl enable minecraft-exporter.service
+  - sed -i 's/#Port 22/Port 0/g' /etc/ssh/sshd_config
+  - service sshd restart
+  - systemctl restart fail2ban
+  - URL="https://maven.minecraftforge.net/net/minecraftforge/forge/1.17.1-138/forge-1.17.1-138-installer.jar"
+  - mkdir /tmp/build
+  - cd /tmp/build
+  - mkdir minecraft
+  - curl -sLSf $URL > forge-installer.jar
+  - java -jar forge-installer.jar --installServer /minecraft
+  - rm -rf /tmp/build
+  - echo "eula=true" > /minecraft/eula.txt
+  - mv /tmp/server.properties /minecraft/server.properties
+  - chmod a+rwx /minecraft
+  - systemctl restart minecraft.service
+  - systemctl enable minecraft.service
