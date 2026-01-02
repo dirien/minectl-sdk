@@ -1,3 +1,4 @@
+// Package cloud provides cloud provider utilities and SSH key helpers.
 package cloud
 
 import (
@@ -28,10 +29,12 @@ var cloudProvider = map[string]string{
 	"fuga":      "Fuga Cloud",
 }
 
+// GetCloudProviderFullName returns the full name for a cloud provider code.
 func GetCloudProviderFullName(cloud string) string {
 	return cloudProvider[cloud]
 }
 
+// GetCloudProviderCode returns the code for a cloud provider full name.
 func GetCloudProviderCode(fullName string) string {
 	for code, name := range cloudProvider {
 		if name == fullName {
@@ -41,6 +44,7 @@ func GetCloudProviderCode(fullName string) string {
 	return ""
 }
 
+// GetSSHPublicKey retrieves the SSH public key from server arguments.
 func GetSSHPublicKey(args automation.ServerArgs) (*string, error) {
 	var err error
 	var pubKeyFile []byte

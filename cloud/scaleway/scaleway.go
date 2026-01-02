@@ -1,3 +1,4 @@
+// Package scaleway implements the Automation interface for Scaleway cloud provider.
 package scaleway
 
 import (
@@ -11,11 +12,12 @@ import (
 	"github.com/dirien/minectl-sdk/common"
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
-	"github.com/scaleway/scaleway-sdk-go/api/iam/v1alpha1"
+	iam "github.com/scaleway/scaleway-sdk-go/api/iam/v1alpha1"
 	"github.com/scaleway/scaleway-sdk-go/api/instance/v1"
 	"github.com/scaleway/scaleway-sdk-go/scw"
 )
 
+// Scaleway implements the Automation interface for Scaleway.
 type Scaleway struct {
 	instanceAPI    *instance.API
 	iamAPI         *iam.API
@@ -23,6 +25,7 @@ type Scaleway struct {
 	tmpl           *minctlTemplate.Template
 }
 
+// NewScaleway creates a new Scaleway instance.
 func NewScaleway(accessKey, secretKey, organizationID, region string) (*Scaleway, error) {
 	zone, err := scw.ParseZone(region)
 	if err != nil {
@@ -49,6 +52,7 @@ func NewScaleway(accessKey, secretKey, organizationID, region string) (*Scaleway
 	}, nil
 }
 
+// CreateServer creates a new Minecraft server on Scaleway.
 func (s *Scaleway) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
@@ -78,7 +82,7 @@ func (s *Scaleway) CreateServer(args automation.ServerArgs) (*automation.Resourc
 		volume, err := s.instanceAPI.CreateVolume(&instance.CreateVolumeRequest{
 			Name:       fmt.Sprintf("%s-vol", args.MinecraftResource.GetName()),
 			VolumeType: instance.VolumeVolumeTypeBSSD,
-			Size:       scw.SizePtr(scw.Size(args.MinecraftResource.GetVolumeSize()) * scw.GB),
+			Size:       scw.SizePtr(scw.Size(args.MinecraftResource.GetVolumeSize()) * scw.GB), //nolint:gosec // volume size is validated
 		})
 		if err != nil {
 			return nil, err
@@ -122,15 +126,20 @@ func (s *Scaleway) CreateServer(args automation.ServerArgs) (*automation.Resourc
 		return nil, err
 	}
 
+	var publicIP string
+	if len(getServer.Server.PublicIPs) > 0 {
+		publicIP = getServer.Server.PublicIPs[0].Address.String()
+	}
 	return &automation.ResourceResults{
 		ID:       server.Server.ID,
 		Name:     server.Server.Name,
 		Region:   server.Server.Zone.String(),
-		PublicIP: getServer.Server.PublicIP.Address.String(),
+		PublicIP: publicIP,
 		Tags:     strings.Join(server.Server.Tags, ","),
 	}, err
 }
 
+// DeleteServer deletes a Minecraft server on Scaleway.
 func (s *Scaleway) DeleteServer(id string, args automation.ServerArgs) error {
 	getServer, err := s.instanceAPI.GetServer(&instance.GetServerRequest{
 		ServerID: id,
@@ -178,6 +187,7 @@ func (s *Scaleway) DeleteServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// ListServer lists all Minecraft servers on Scaleway.
 func (s *Scaleway) ListServer() ([]automation.ResourceResults, error) {
 	servers, err := s.instanceAPI.ListServers(&instance.ListServersRequest{
 		Tags: []string{common.InstanceTag},
@@ -187,9 +197,13 @@ func (s *Scaleway) ListServer() ([]automation.ResourceResults, error) {
 	}
 	var result []automation.ResourceResults
 	for _, server := range servers.Servers {
+		var publicIP string
+		if len(server.PublicIPs) > 0 {
+			publicIP = server.PublicIPs[0].Address.String()
+		}
 		result = append(result, automation.ResourceResults{
 			ID:       server.ID,
-			PublicIP: server.PublicIP.Address.String(),
+			PublicIP: publicIP,
 			Name:     server.Name,
 			Region:   server.Zone.String(),
 			Tags:     strings.Join(server.Tags, ","),
@@ -198,15 +212,20 @@ func (s *Scaleway) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
+// UpdateServer updates a Minecraft server on Scaleway.
 func (s *Scaleway) UpdateServer(id string, args automation.ServerArgs) error {
-	instance, err := s.instanceAPI.GetServer(&instance.GetServerRequest{
+	inst, err := s.instanceAPI.GetServer(&instance.GetServerRequest{
 		ServerID: id,
 	})
 	if err != nil {
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.Server.PublicIP.Address.String(), "root")
+	var publicIP string
+	if len(inst.Server.PublicIPs) > 0 {
+		publicIP = inst.Server.PublicIPs[0].Address.String()
+	}
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, publicIP, "root")
 	err = remoteCommand.UpdateServer(args.MinecraftResource)
 	if err != nil {
 		return err
@@ -214,15 +233,20 @@ func (s *Scaleway) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on Scaleway.
 func (s *Scaleway) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
-	instance, err := s.instanceAPI.GetServer(&instance.GetServerRequest{
+	inst, err := s.instanceAPI.GetServer(&instance.GetServerRequest{
 		ServerID: id,
 	})
 	if err != nil {
 		return err
 	}
 
-	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, instance.Server.PublicIP.Address.String(), "root")
+	var publicIP string
+	if len(inst.Server.PublicIPs) > 0 {
+		publicIP = inst.Server.PublicIPs[0].Address.String()
+	}
+	remoteCommand := update.NewRemoteServer(args.SSHPrivateKeyPath, publicIP, "root")
 	err = remoteCommand.TransferFile(plugin, filepath.Join(destination, filepath.Base(plugin)), args.MinecraftResource.GetSSHPort())
 	if err != nil {
 		return err
@@ -234,18 +258,23 @@ func (s *Scaleway) UploadPlugin(id string, args automation.ServerArgs, plugin, d
 	return nil
 }
 
-func (s *Scaleway) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
-	instance, err := s.instanceAPI.GetServer(&instance.GetServerRequest{
+// GetServer gets a Minecraft server on Scaleway.
+func (s *Scaleway) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
+	inst, err := s.instanceAPI.GetServer(&instance.GetServerRequest{
 		ServerID: id,
 	})
 	if err != nil {
 		return nil, err
 	}
+	var publicIP string
+	if len(inst.Server.PublicIPs) > 0 {
+		publicIP = inst.Server.PublicIPs[0].Address.String()
+	}
 	return &automation.ResourceResults{
-		ID:       instance.Server.ID,
-		Name:     instance.Server.Name,
-		Region:   instance.Server.Zone.String(),
-		PublicIP: instance.Server.PublicIP.Address.String(),
-		Tags:     strings.Join(instance.Server.Tags, ","),
+		ID:       inst.Server.ID,
+		Name:     inst.Server.Name,
+		Region:   inst.Server.Zone.String(),
+		PublicIP: publicIP,
+		Tags:     strings.Join(inst.Server.Tags, ","),
 	}, err
 }

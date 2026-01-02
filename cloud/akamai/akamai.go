@@ -1,3 +1,4 @@
+// Package akamai implements the Automation interface for Akamai (formerly Linode) cloud provider.
 package akamai
 
 import (
@@ -19,11 +20,13 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// Akamai implements the Automation interface for Akamai cloud provider.
 type Akamai struct {
 	client linodego.Client
 	tmpl   *minctlTemplate.Template
 }
 
+// NewAkamai creates a new Akamai instance.
 func NewAkamai(apiToken string) (*Akamai, error) {
 	tokenSource := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: apiToken})
 
@@ -45,6 +48,7 @@ func NewAkamai(apiToken string) (*Akamai, error) {
 	return linode, nil
 }
 
+// CreateServer creates a new Minecraft server on Akamai.
 func (l *Akamai) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	ubuntuImage := "linode/ubuntu22.04"
 	publicKey, err := cloud.GetSSHPublicKey(args)
@@ -127,6 +131,7 @@ func (l *Akamai) CreateServer(args automation.ServerArgs) (*automation.ResourceR
 	}, err
 }
 
+// DeleteServer deletes a Minecraft server on Akamai.
 func (l *Akamai) DeleteServer(id string, args automation.ServerArgs) error {
 	keys, err := l.client.ListSSHKeys(context.Background(), nil)
 	if err != nil {
@@ -182,6 +187,7 @@ func (l *Akamai) DeleteServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// ListServer lists all Minecraft servers on Akamai.
 func (l *Akamai) ListServer() ([]automation.ResourceResults, error) {
 	servers, err := l.client.ListInstances(context.Background(), linodego.NewListOptions(0, "{\"tags\":\"minectl\"}"))
 	if err != nil {
@@ -200,6 +206,7 @@ func (l *Akamai) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
+// UpdateServer updates a Minecraft server on Akamai.
 func (l *Akamai) UpdateServer(id string, args automation.ServerArgs) error {
 	intID, _ := strconv.Atoi(id)
 	instance, err := l.client.GetInstance(context.Background(), intID)
@@ -215,6 +222,7 @@ func (l *Akamai) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on Akamai.
 func (l *Akamai) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	intID, _ := strconv.Atoi(id)
 	instance, err := l.client.GetInstance(context.Background(), intID)
@@ -234,7 +242,8 @@ func (l *Akamai) UploadPlugin(id string, args automation.ServerArgs, plugin, des
 	return nil
 }
 
-func (l *Akamai) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
+// GetServer gets a Minecraft server on Akamai.
+func (l *Akamai) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
 	intID, _ := strconv.Atoi(id)
 	instance, err := l.client.GetInstance(context.Background(), intID)
 	if err != nil {

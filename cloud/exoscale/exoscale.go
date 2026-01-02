@@ -1,3 +1,4 @@
+// Package exoscale implements the Automation interface for Exoscale cloud provider.
 package exoscale
 
 import (
@@ -21,10 +22,12 @@ import (
 
 var userAgent string
 
+// String returns a pointer to the given string.
 func String(v string) *string {
 	return &v
 }
 
+// Exoscale implements the Automation interface for Exoscale.
 type Exoscale struct {
 	client   *egoscale.Client
 	clientv2 *v2.Client
@@ -46,6 +49,7 @@ func (t *defaultTransport) RoundTrip(req *http.Request) (*http.Response, error) 
 	return resp, nil
 }
 
+// NewExoscale creates a new Exoscale instance.
 func NewExoscale(apiKey, apiSecret string) (*Exoscale, error) {
 	httpClient := cleanhttp.DefaultPooledClient()
 	httpClient.Transport = &defaultTransport{next: httpClient.Transport}
@@ -72,6 +76,7 @@ func NewExoscale(apiKey, apiSecret string) (*Exoscale, error) {
 	return es, nil
 }
 
+// CreateServer creates a new Minecraft server on Exoscale.
 func (e *Exoscale) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	ctx := context.Background()
 
@@ -90,8 +95,8 @@ func (e *Exoscale) CreateServer(args automation.ServerArgs) (*automation.Resourc
 	_, err = e.client.Request(egoscale.AuthorizeSecurityGroupIngress{
 		SecurityGroupName: fmt.Sprintf("%s-sg", args.MinecraftResource.GetName()),
 		Protocol:          "TCP",
-		StartPort:         uint16(args.MinecraftResource.GetSSHPort()),
-		EndPort:           uint16(args.MinecraftResource.GetSSHPort()),
+		StartPort:         uint16(args.MinecraftResource.GetSSHPort()), //nolint:gosec // port is validated
+		EndPort:           uint16(args.MinecraftResource.GetSSHPort()), //nolint:gosec // port is validated
 		CIDRList: []egoscale.CIDR{
 			{
 				IPNet: *cidr,
@@ -105,8 +110,8 @@ func (e *Exoscale) CreateServer(args automation.ServerArgs) (*automation.Resourc
 		_, err = e.client.Request(egoscale.AuthorizeSecurityGroupIngress{
 			SecurityGroupName: fmt.Sprintf("%s-sg", args.MinecraftResource.GetName()),
 			Protocol:          "UDP",
-			StartPort:         uint16(args.MinecraftResource.GetPort()),
-			EndPort:           uint16(args.MinecraftResource.GetPort()),
+			StartPort:         uint16(args.MinecraftResource.GetPort()), //nolint:gosec // port is validated
+			EndPort:           uint16(args.MinecraftResource.GetPort()), //nolint:gosec // port is validated
 			CIDRList: []egoscale.CIDR{
 				{
 					IPNet: *cidr,
@@ -120,8 +125,8 @@ func (e *Exoscale) CreateServer(args automation.ServerArgs) (*automation.Resourc
 		_, err = e.client.Request(egoscale.AuthorizeSecurityGroupIngress{
 			SecurityGroupName: fmt.Sprintf("%s-sg", args.MinecraftResource.GetName()),
 			Protocol:          "TCP",
-			StartPort:         uint16(args.MinecraftResource.GetPort()),
-			EndPort:           uint16(args.MinecraftResource.GetPort()),
+			StartPort:         uint16(args.MinecraftResource.GetPort()), //nolint:gosec // port is validated
+			EndPort:           uint16(args.MinecraftResource.GetPort()), //nolint:gosec // port is validated
 			CIDRList: []egoscale.CIDR{
 				{
 					IPNet: *cidr,
@@ -135,8 +140,8 @@ func (e *Exoscale) CreateServer(args automation.ServerArgs) (*automation.Resourc
 			_, err = e.client.Request(egoscale.AuthorizeSecurityGroupIngress{
 				SecurityGroupName: fmt.Sprintf("%s-sg", args.MinecraftResource.GetName()),
 				Protocol:          "TCP",
-				StartPort:         uint16(args.MinecraftResource.GetRCONPort()),
-				EndPort:           uint16(args.MinecraftResource.GetRCONPort()),
+				StartPort:         uint16(args.MinecraftResource.GetRCONPort()), //nolint:gosec // port is validated
+				EndPort:           uint16(args.MinecraftResource.GetRCONPort()), //nolint:gosec // port is validated
 				CIDRList: []egoscale.CIDR{
 					{
 						IPNet: *cidr,
@@ -253,6 +258,7 @@ func (e *Exoscale) CreateServer(args automation.ServerArgs) (*automation.Resourc
 	}, err
 }
 
+// DeleteServer deletes a Minecraft server on Exoscale.
 func (e *Exoscale) DeleteServer(id string, args automation.ServerArgs) error {
 	ctx := context.Background()
 
@@ -289,10 +295,12 @@ func (e *Exoscale) DeleteServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// ListServer lists all Minecraft servers on Exoscale.
 func (e *Exoscale) ListServer() ([]automation.ResourceResults, error) {
 	panic("List Server is not possible with Exoscale, as it does not support labels in v1")
 }
 
+// UpdateServer updates a Minecraft server on Exoscale.
 func (e *Exoscale) UpdateServer(id string, args automation.ServerArgs) error {
 	instance, err := e.GetServer(id, args)
 	if err != nil {
@@ -306,6 +314,7 @@ func (e *Exoscale) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on Exoscale.
 func (e *Exoscale) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	instance, err := e.GetServer(id, args)
 	if err != nil {
@@ -323,6 +332,7 @@ func (e *Exoscale) UploadPlugin(id string, args automation.ServerArgs, plugin, d
 	return nil
 }
 
+// GetServer gets a Minecraft server on Exoscale.
 func (e *Exoscale) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
 	ctx := context.Background()
 

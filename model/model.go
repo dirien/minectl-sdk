@@ -1,3 +1,4 @@
+// Package model defines data models for Minecraft server configurations.
 package model
 
 import "reflect"
@@ -107,42 +108,52 @@ type MinecraftResource struct {
 	Metadata   Metadata `yaml:"metadata"`
 }
 
+// GetProperties returns the Minecraft server properties.
 func (m *MinecraftResource) GetProperties() string {
 	return m.Spec.Minecraft.Properties
 }
 
+// GetName returns the resource name.
 func (m *MinecraftResource) GetName() string {
 	return m.Metadata.Name
 }
 
+// GetCloud returns the cloud provider name.
 func (m *MinecraftResource) GetCloud() string {
 	return m.Spec.Server.Cloud
 }
 
+// GetSSHPort returns the SSH port.
 func (m *MinecraftResource) GetSSHPort() int {
 	return m.Spec.Server.SSH.Port
 }
 
+// GetSSHKeyFile returns the SSH public key file path.
 func (m *MinecraftResource) GetSSHKeyFile() string {
 	return m.Spec.Server.SSH.PublicKeyFile
 }
 
+// GetSSHPublicKey returns the SSH public key content.
 func (m *MinecraftResource) GetSSHPublicKey() string {
 	return m.Spec.Server.SSH.PublicKey
 }
 
+// GetFail2Ban returns the fail2ban configuration.
 func (m *MinecraftResource) GetFail2Ban() Fail2ban {
 	return m.Spec.Server.SSH.Fail2ban
 }
 
+// GetRegion returns the cloud region.
 func (m *MinecraftResource) GetRegion() string {
 	return m.Spec.Server.Region
 }
 
+// GetSize returns the server size.
 func (m *MinecraftResource) GetSize() string {
 	return m.Spec.Server.Size
 }
 
+// GetEdition returns the Minecraft edition.
 func (m *MinecraftResource) GetEdition() string {
 	if m.IsProxyServer() {
 		return m.Spec.Proxy.Type
@@ -150,22 +161,27 @@ func (m *MinecraftResource) GetEdition() string {
 	return m.Spec.Minecraft.Edition
 }
 
+// GetVolumeSize returns the volume size.
 func (m *MinecraftResource) GetVolumeSize() int {
 	return m.Spec.Server.VolumeSize
 }
 
+// GetVersion returns the Minecraft version.
 func (m *MinecraftResource) GetVersion() string {
 	return m.Spec.Minecraft.Version
 }
 
+// GetPort returns the server port.
 func (m *MinecraftResource) GetPort() int {
 	return m.Spec.Server.Port
 }
 
+// GetJDKVersion returns the JDK version.
 func (m *MinecraftResource) GetJDKVersion() int {
 	return m.Spec.Minecraft.Java.OpenJDK
 }
 
+// GetRCONPort returns the RCON port.
 func (m *MinecraftResource) GetRCONPort() int {
 	if m.IsProxyServer() {
 		return m.Spec.Proxy.Java.Rcon.Port
@@ -173,6 +189,7 @@ func (m *MinecraftResource) GetRCONPort() int {
 	return m.Spec.Minecraft.Java.Rcon.Port
 }
 
+// HasRCON returns whether RCON is enabled.
 func (m *MinecraftResource) HasRCON() bool {
 	if m.IsProxyServer() {
 		return m.Spec.Proxy.Java.Rcon.Enabled
@@ -180,10 +197,12 @@ func (m *MinecraftResource) HasRCON() bool {
 	return m.Spec.Minecraft.Java.Rcon.Enabled
 }
 
+// HasMonitoring returns whether monitoring is enabled.
 func (m *MinecraftResource) HasMonitoring() bool {
 	return m.Spec.Monitoring.Enabled
 }
 
+// GetRCONPassword returns the RCON password.
 func (m *MinecraftResource) GetRCONPassword() string {
 	if m.IsProxyServer() {
 		return m.Spec.Proxy.Java.Rcon.Password
@@ -191,32 +210,36 @@ func (m *MinecraftResource) GetRCONPassword() string {
 	return m.Spec.Minecraft.Java.Rcon.Password
 }
 
+// IsProxyServer returns whether this is a proxy server.
 func (m *MinecraftResource) IsProxyServer() bool {
 	return reflect.DeepEqual(m.Spec.Minecraft, Minecraft{})
 }
 
+// IsSpot returns whether this is a spot instance.
 func (m *MinecraftResource) IsSpot() bool {
 	return m.Spec.Server.Spot
 }
 
+// IsArm returns whether this is an ARM architecture.
 func (m *MinecraftResource) IsArm() bool {
 	return m.Spec.Server.Arm
 }
 
+// Provider constants for supported cloud providers.
 const (
-	PROVIDER_HETZNER      = "hetzner"
-	PROVIDER_DIGITALOCEAN = "do"
-	PROVIDER_CIVO         = "civo"
-	PROVIDER_SCALEWAY     = "scaleway"
-	PROVIDER_AKAMAI       = "akamai"
-	PROVIDER_OVH          = "ovh"
-	PROVIDER_GCE          = "gce"
-	PROVIDER_VULTR        = "vultr"
-	PROVIDER_AZURE        = "azure"
-	PROVIDER_OCI          = "oci"
-	PROVIDER_AWS          = "aws"
-	PROVIDER_VEXXHOST     = "vexxhost"
-	PROVIDER_FUGA         = "fuga"
-	PROVIDER_EXOSCALE     = "exoscale"
-	PROVIDER_MULTIPASS    = "multipass"
+	ProviderHetzner      = "hetzner"
+	ProviderDigitalocean = "do"
+	ProviderCivo         = "civo"
+	ProviderScaleway     = "scaleway"
+	ProviderAkamai       = "akamai"
+	ProviderOvh          = "ovh"
+	ProviderGce          = "gce"
+	ProviderVultr        = "vultr"
+	ProviderAzure        = "azure"
+	ProviderOci          = "oci"
+	ProviderAws          = "aws"
+	ProviderVexxhost     = "vexxhost"
+	ProviderFuga         = "fuga"
+	ProviderExoscale     = "exoscale"
+	ProviderMultipass    = "multipass"
 )

@@ -1,3 +1,4 @@
+// Package do implements the Automation interface for DigitalOcean cloud provider.
 package do
 
 import (
@@ -17,6 +18,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// DigitalOcean implements the Automation interface for DigitalOcean.
 type DigitalOcean struct {
 	client *godo.Client
 	tmpl   *minctlTemplate.Template
@@ -35,6 +37,7 @@ func (t *TokenSource) Token() (*oauth2.Token, error) {
 	return token, nil
 }
 
+// NewDigitalOcean creates a new DigitalOcean instance.
 func NewDigitalOcean(apiKey string) (*DigitalOcean, error) {
 	tokenSource := &TokenSource{
 		AccessToken: apiKey,
@@ -52,6 +55,7 @@ func NewDigitalOcean(apiKey string) (*DigitalOcean, error) {
 	return do, nil
 }
 
+// ListServer lists all Minecraft servers on DigitalOcean.
 func (d *DigitalOcean) ListServer() ([]automation.ResourceResults, error) {
 	droplets, _, err := d.client.Droplets.ListByTag(context.Background(), common.InstanceTag, nil)
 	if err != nil {
@@ -71,6 +75,7 @@ func (d *DigitalOcean) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
+// UpdateServer updates a Minecraft server on DigitalOcean.
 func (d *DigitalOcean) UpdateServer(id string, args automation.ServerArgs) error {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
@@ -90,6 +95,7 @@ func (d *DigitalOcean) UpdateServer(id string, args automation.ServerArgs) error
 	return nil
 }
 
+// CreateServer creates a new Minecraft server on DigitalOcean.
 func (d *DigitalOcean) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
@@ -178,6 +184,7 @@ func (d *DigitalOcean) CreateServer(args automation.ServerArgs) (*automation.Res
 	}, err
 }
 
+// DeleteServer deletes a Minecraft server on DigitalOcean.
 func (d *DigitalOcean) DeleteServer(id string, args automation.ServerArgs) error {
 	list, _, err := d.client.Keys.List(context.Background(), nil)
 	if err != nil {
@@ -223,6 +230,7 @@ func (d *DigitalOcean) DeleteServer(id string, args automation.ServerArgs) error
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on DigitalOcean.
 func (d *DigitalOcean) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
@@ -246,6 +254,7 @@ func (d *DigitalOcean) UploadPlugin(id string, args automation.ServerArgs, plugi
 	return nil
 }
 
+// GetServer gets a Minecraft server on DigitalOcean.
 func (d *DigitalOcean) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {

@@ -1,3 +1,4 @@
+// Package aws implements the Automation interface for Amazon Web Services.
 package aws
 
 import (
@@ -25,6 +26,7 @@ import (
 
 const instanceNameTag = "Name"
 
+// Aws implements the Automation interface for AWS.
 type Aws struct {
 	client *ec2.Client
 	tmpl   *minctlTemplate.Template
@@ -56,6 +58,7 @@ func NewAWS(region string) (*Aws, error) {
 	}, err
 }
 
+// ListServer lists all Minecraft servers on AWS.
 func (a *Aws) ListServer() ([]automation.ResourceResults, error) {
 	ctx := context.TODO()
 	var result []automation.ResourceResults
@@ -121,7 +124,7 @@ func addBlockDevice(volumeSize int) []types.BlockDeviceMapping {
 			{
 				DeviceName: aws.String("/dev/sda1"),
 				Ebs: &types.EbsBlockDevice{
-					VolumeSize: aws.Int32(int32(volumeSize)),
+					VolumeSize: aws.Int32(int32(volumeSize)), //nolint:gosec // volumeSize is validated
 				},
 			},
 		}
@@ -204,7 +207,6 @@ func addTagSpecifications(args automation.ServerArgs, resourceType types.Resourc
 
 // CreateServer TODO: https://github.com/dirien/minectl/issues/298
 func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) { //nolint: gocyclo
-	ctx := context.TODO()
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
 
@@ -434,6 +436,7 @@ func (a *Aws) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 	}
 }
 
+// UpdateServer updates a Minecraft server on AWS.
 func (a *Aws) UpdateServer(id string, args automation.ServerArgs) error {
 	ctx := context.TODO()
 	ids, _, _ := strings.Cut(id, "#")
@@ -453,6 +456,7 @@ func (a *Aws) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// DeleteServer deletes a Minecraft server on AWS.
 func (a *Aws) DeleteServer(id string, args automation.ServerArgs) error {
 	ctx := context.TODO()
 
@@ -593,6 +597,7 @@ func (a *Aws) DeleteServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on AWS.
 func (a *Aws) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	ctx := context.TODO()
 	ids, _, _ := strings.Cut(id, "#")
@@ -618,6 +623,7 @@ func (a *Aws) UploadPlugin(id string, args automation.ServerArgs, plugin, destin
 	return nil
 }
 
+// GetServer gets a Minecraft server on AWS.
 func (a *Aws) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
 	ctx := context.TODO()
 	ids, _, _ := strings.Cut(id, "#")
@@ -685,9 +691,9 @@ func (a *Aws) createEC2SecurityGroup(ctx context.Context, vpcID *string, protoco
 func (a *Aws) createEC2SecurityGroupRule(ctx context.Context, groupID, protocol string, fromPort, toPort int) error {
 	_, err := a.client.AuthorizeSecurityGroupIngress(ctx, &ec2.AuthorizeSecurityGroupIngressInput{
 		CidrIp:     aws.String("0.0.0.0/0"),
-		FromPort:   aws.Int32(int32(fromPort)),
+		FromPort:   aws.Int32(int32(fromPort)), //nolint:gosec // port numbers are safe
 		IpProtocol: aws.String(protocol),
-		ToPort:     aws.Int32(int32(toPort)),
+		ToPort:     aws.Int32(int32(toPort)), //nolint:gosec // port numbers are safe
 		GroupId:    aws.String(groupID),
 	})
 	if err != nil {

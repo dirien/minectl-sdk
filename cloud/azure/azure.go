@@ -1,3 +1,4 @@
+// Package azure implements the Automation interface for Azure cloud provider.
 package azure
 
 import (
@@ -21,6 +22,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// Azure implements the Automation interface for Azure.
 type Azure struct {
 	subscriptionID string
 	credential     *azidentity.DefaultAzureCredential
@@ -69,6 +71,7 @@ func getTagKeys(tags map[string]*string) []string {
 	return keys
 }
 
+// CreateServer creates a new Minecraft server on Azure.
 func (a *Azure) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	ctx := context.Background()
 	resourceGroupsClient, err := armresources.NewResourceGroupsClient(a.subscriptionID, a.credential, nil)
@@ -201,7 +204,7 @@ func (a *Azure) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 					CreationData: &armcompute.CreationData{
 						CreateOption: to.Ptr(armcompute.DiskCreateOptionEmpty),
 					},
-					DiskSizeGB: to.Ptr(int32(args.MinecraftResource.GetVolumeSize())),
+					DiskSizeGB: to.Ptr(int32(args.MinecraftResource.GetVolumeSize())), //nolint:gosec // volume size is validated
 				},
 			}, nil)
 		if err != nil {
@@ -334,7 +337,8 @@ func (a *Azure) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 	}, err
 }
 
-func (a *Azure) DeleteServer(id string, args automation.ServerArgs) error {
+// DeleteServer deletes a Minecraft server on Azure.
+func (a *Azure) DeleteServer(_ string, args automation.ServerArgs) error {
 	ctx := context.Background()
 	resourceGroupName := fmt.Sprintf("%s-rg", args.MinecraftResource.GetName())
 	resourceGroupsClient, err := armresources.NewResourceGroupsClient(a.subscriptionID, a.credential, nil)
@@ -357,6 +361,7 @@ func (a *Azure) DeleteServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// ListServer lists all Minecraft servers on Azure.
 func (a *Azure) ListServer() ([]automation.ResourceResults, error) {
 	ctx := context.Background()
 	virtualMachinesClient, err := armcompute.NewVirtualMachinesClient(a.subscriptionID, a.credential, nil)
@@ -405,6 +410,7 @@ func (a *Azure) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
+// UpdateServer updates a Minecraft server on Azure.
 func (a *Azure) UpdateServer(id string, args automation.ServerArgs) error {
 	server, err := a.GetServer(id, args)
 	if err != nil {
@@ -419,6 +425,7 @@ func (a *Azure) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on Azure.
 func (a *Azure) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	server, err := a.GetServer(id, args)
 	if err != nil {
@@ -440,6 +447,7 @@ func (a *Azure) UploadPlugin(id string, args automation.ServerArgs, plugin, dest
 	return nil
 }
 
+// GetServer gets a Minecraft server on Azure.
 func (a *Azure) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
 	virtualMachinesClient, err := armcompute.NewVirtualMachinesClient(a.subscriptionID, a.credential, nil)
 	if err != nil {
