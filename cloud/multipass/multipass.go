@@ -1,3 +1,4 @@
+// Package multipass implements the Automation interface for Ubuntu Multipass.
 package multipass
 
 import (
@@ -19,10 +20,12 @@ const (
 	multipassBinary = "multipass"
 )
 
+// Multipass implements the Automation interface for Ubuntu Multipass.
 type Multipass struct {
 	tmpl *minctlTemplate.Template
 }
 
+// NewMultipass creates a new Multipass instance.
 func NewMultipass() (*Multipass, error) {
 	tmpl, err := minctlTemplate.NewTemplateCloudConfig()
 	if err != nil {
@@ -33,6 +36,7 @@ func NewMultipass() (*Multipass, error) {
 	}, nil
 }
 
+// CreateServer creates a new Multipass VM.
 func (m *Multipass) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
@@ -63,7 +67,7 @@ func (m *Multipass) CreateServer(args automation.ServerArgs) (*automation.Resour
 	arg7 := "-m"
 	arg8 := v
 
-	cmd := exec.Command(app, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+	cmd := exec.Command(app, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) //nolint:gosec // multipass command with validated inputs
 	cmdOutput := &bytes.Buffer{}
 	cmd.Stdout = cmdOutput
 	err = cmd.Run()
@@ -74,7 +78,8 @@ func (m *Multipass) CreateServer(args automation.ServerArgs) (*automation.Resour
 	return m.GetServer(args.MinecraftResource.GetName(), args)
 }
 
-func (m *Multipass) DeleteServer(id string, args automation.ServerArgs) error {
+// DeleteServer deletes a Minecraft server on Multipass.
+func (m *Multipass) DeleteServer(id string, _ automation.ServerArgs) error {
 	cmd := exec.Command(multipassBinary, "delete", id)
 	cmdOutput := &bytes.Buffer{}
 	cmd.Stdout = cmdOutput
@@ -92,10 +97,12 @@ func (m *Multipass) DeleteServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// ListServer lists all Minecraft servers on Multipass.
 func (m *Multipass) ListServer() ([]automation.ResourceResults, error) {
 	panic("List Server is not possible with Multipass, as it does not support labels")
 }
 
+// UpdateServer updates a Minecraft server on Multipass.
 func (m Multipass) UpdateServer(id string, args automation.ServerArgs) error {
 	instance, err := m.GetServer(id, args)
 	if err != nil {
@@ -110,6 +117,7 @@ func (m Multipass) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on Multipass.
 func (m Multipass) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	instance, err := m.GetServer(id, args)
 	if err != nil {
@@ -128,7 +136,8 @@ func (m Multipass) UploadPlugin(id string, args automation.ServerArgs, plugin, d
 	return nil
 }
 
-func (m Multipass) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
+// GetServer gets a Minecraft server on Multipass.
+func (m Multipass) GetServer(_ string, args automation.ServerArgs) (*automation.ResourceResults, error) {
 	cmd := exec.Command(multipassBinary, "info", "--format", "json", args.MinecraftResource.GetName()) //nolint: gosec
 	cmdOutput := &bytes.Buffer{}
 	cmd.Stdout = cmdOutput

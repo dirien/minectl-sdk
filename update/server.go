@@ -1,3 +1,4 @@
+// Package update provides remote server operations via SSH.
 package update
 
 import (
@@ -12,16 +13,19 @@ import (
 	"github.com/melbahja/goph"
 )
 
+// ServerOperations defines remote server operations.
 type ServerOperations interface {
 	UpdateServer(*model.MinecraftResource) error
 }
 
+// RemoteServer represents a remote server connection.
 type RemoteServer struct {
 	ip            string
 	privateSSHKey string
 	user          string
 }
 
+// NewRemoteServer creates a new RemoteServer instance.
 func NewRemoteServer(privateKey, ip, user string) *RemoteServer {
 	ssh := &RemoteServer{
 		ip:            ip,
@@ -31,6 +35,7 @@ func NewRemoteServer(privateKey, ip, user string) *RemoteServer {
 	return ssh
 }
 
+// UpdateServer updates the Minecraft server software.
 func (r *RemoteServer) UpdateServer(args *model.MinecraftResource) error {
 	tmpl := minctlTemplate.GetUpdateTemplate()
 	var update string
@@ -88,6 +93,7 @@ sudo systemctl start minecraft.service
 	return nil
 }
 
+// TransferFile uploads a file to the remote server.
 func (r *RemoteServer) TransferFile(src, dstPath string, port int) error {
 	auth, err := goph.Key(r.privateSSHKey, "")
 	if err != nil {
@@ -97,7 +103,7 @@ func (r *RemoteServer) TransferFile(src, dstPath string, port int) error {
 	client, err := goph.NewConn(&goph.Config{
 		User:     r.user,
 		Addr:     r.ip,
-		Port:     uint(port),
+		Port:     uint(port), //nolint:gosec // port is validated
 		Auth:     auth,
 		Callback: ssh.InsecureIgnoreHostKey(), //nolint:gosec
 	})
@@ -105,7 +111,7 @@ func (r *RemoteServer) TransferFile(src, dstPath string, port int) error {
 		return err
 	}
 
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 	err = client.Upload(src, dstPath)
 	if err != nil {
 		return err
@@ -113,6 +119,7 @@ func (r *RemoteServer) TransferFile(src, dstPath string, port int) error {
 	return nil
 }
 
+// ExecuteCommand runs a command on the remote server.
 func (r *RemoteServer) ExecuteCommand(cmd string, port int) (string, error) {
 	auth, err := goph.Key(r.privateSSHKey, "")
 	if err != nil {
@@ -121,7 +128,7 @@ func (r *RemoteServer) ExecuteCommand(cmd string, port int) (string, error) {
 	client, err := goph.NewConn(&goph.Config{
 		User:     r.user,
 		Addr:     r.ip,
-		Port:     uint(port),
+		Port:     uint(port), //nolint:gosec // port is validated
 		Auth:     auth,
 		Callback: ssh.InsecureIgnoreHostKey(), //nolint:gosec
 	})
@@ -129,7 +136,7 @@ func (r *RemoteServer) ExecuteCommand(cmd string, port int) (string, error) {
 		return "", err
 	}
 
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 	out, err := client.Run(cmd)
 	return string(out), err
 }

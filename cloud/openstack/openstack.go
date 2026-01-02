@@ -1,3 +1,4 @@
+// Package openstack implements the Automation interface for OpenStack cloud providers.
 package openstack
 
 import (
@@ -29,6 +30,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// OpenStack implements the Automation interface for OpenStack.
 type OpenStack struct {
 	tmpl          *minctlTemplate.Template
 	computeClient *gophercloud.ServiceClient
@@ -53,6 +55,7 @@ func getTagKeys(tags map[string]string) []string {
 	return keys
 }
 
+// NewOpenStack creates a new OpenStack instance.
 func NewOpenStack(imageName string) (*OpenStack, error) {
 	ctx := context.Background()
 	tmpl, err := minctlTemplate.NewTemplateCloudConfig()
@@ -131,7 +134,7 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 
 	var image images.Image
 	pager := images.List(o.imageClient, listOpts)
-	err = pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
+	err = pager.EachPage(ctx, func(_ context.Context, page pagination.Page) (bool, error) {
 		imageList, err := images.ExtractImages(page)
 		if err != nil {
 			return false, err
@@ -151,7 +154,7 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 	var flavor flavors.Flavor
 
 	flavorPager := flavors.ListDetail(o.computeClient, flavors.ListOpts{})
-	err = flavorPager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
+	err = flavorPager.EachPage(ctx, func(_ context.Context, page pagination.Page) (bool, error) {
 		flavorsList, err := flavors.ExtractFlavors(page)
 		if err != nil {
 			return false, err
@@ -230,7 +233,7 @@ func (o *OpenStack) CreateServer(args automation.ServerArgs) (*automation.Resour
 		Name: "public",
 	})
 	var publicNetwork networks.Network
-	err = networkPager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
+	err = networkPager.EachPage(ctx, func(_ context.Context, page pagination.Page) (bool, error) {
 		networkList, err := networks.ExtractNetworks(page)
 		if err != nil {
 			return false, err
@@ -356,6 +359,7 @@ func (o *OpenStack) createSecurityGroup(ctx context.Context, group *secgroups.Se
 	return nil
 }
 
+// DeleteServer deletes a Minecraft server on OpenStack.
 func (o *OpenStack) DeleteServer(id string, args automation.ServerArgs) error {
 	ctx := context.Background()
 	server, err := servers.Get(ctx, o.computeClient, id).Extract()
@@ -441,7 +445,7 @@ func (o *OpenStack) getRouterByName(ctx context.Context, args automation.ServerA
 	pager := routers.List(o.networkClient, routers.ListOpts{
 		Name: fmt.Sprintf("%s-router", args.MinecraftResource.GetName()),
 	})
-	err := pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
+	err := pager.EachPage(ctx, func(_ context.Context, page pagination.Page) (bool, error) {
 		routerList, err := routers.ExtractRouters(page)
 		if err != nil {
 			return false, err
@@ -460,10 +464,10 @@ func (o *OpenStack) getRouterByName(ctx context.Context, args automation.ServerA
 	return router, nil
 }
 
-func (o *OpenStack) getFloatingIPByInstanceID(ctx context.Context, id string) (*floatingips.FloatingIP, error) {
+func (o *OpenStack) getFloatingIPByInstanceID(ctx context.Context, _ string) (*floatingips.FloatingIP, error) {
 	var floatingIP *floatingips.FloatingIP
 	pager := floatingips.List(o.networkClient, floatingips.ListOpts{})
-	err := pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
+	err := pager.EachPage(ctx, func(_ context.Context, page pagination.Page) (bool, error) {
 		list, err := floatingips.ExtractFloatingIPs(page)
 		if err != nil {
 			return false, err
@@ -487,7 +491,7 @@ func (o *OpenStack) getFloatingIPByInstanceID(ctx context.Context, id string) (*
 func (o *OpenStack) getSecurityGroupByName(ctx context.Context, args automation.ServerArgs) (*secgroups.SecurityGroup, error) {
 	var securityGroup *secgroups.SecurityGroup
 	pager := secgroups.List(o.computeClient)
-	err := pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
+	err := pager.EachPage(ctx, func(_ context.Context, page pagination.Page) (bool, error) {
 		list, err := secgroups.ExtractSecurityGroups(page)
 		if err != nil {
 			return false, err
@@ -511,7 +515,7 @@ func (o *OpenStack) getSubNetByName(ctx context.Context, args automation.ServerA
 	pager := subnets.List(o.networkClient, subnets.ListOpts{
 		Name: fmt.Sprintf("%s-subnet", args.MinecraftResource.GetName()),
 	})
-	err := pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
+	err := pager.EachPage(ctx, func(_ context.Context, page pagination.Page) (bool, error) {
 		list, err := subnets.ExtractSubnets(page)
 		if err != nil {
 			return false, err
@@ -535,7 +539,7 @@ func (o *OpenStack) getNetworkByName(ctx context.Context, args automation.Server
 	pager := networks.List(o.networkClient, networks.ListOpts{
 		Name: fmt.Sprintf("%s-net", args.MinecraftResource.GetName()),
 	})
-	err := pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
+	err := pager.EachPage(ctx, func(_ context.Context, page pagination.Page) (bool, error) {
 		list, err := networks.ExtractNetworks(page)
 		if err != nil {
 			return false, err
@@ -554,6 +558,7 @@ func (o *OpenStack) getNetworkByName(ctx context.Context, args automation.Server
 	return network, nil
 }
 
+// ListServer lists all Minecraft servers on OpenStack.
 func (o *OpenStack) ListServer() ([]automation.ResourceResults, error) {
 	ctx := context.Background()
 	var result []automation.ResourceResults
@@ -592,6 +597,7 @@ func (o *OpenStack) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
+// UpdateServer updates a Minecraft server on OpenStack.
 func (o *OpenStack) UpdateServer(id string, args automation.ServerArgs) error {
 	server, err := o.GetServer(id, args)
 	if err != nil {
@@ -606,6 +612,7 @@ func (o *OpenStack) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on OpenStack.
 func (o *OpenStack) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	server, err := o.GetServer(id, args)
 	if err != nil {
@@ -627,7 +634,8 @@ func (o *OpenStack) UploadPlugin(id string, args automation.ServerArgs, plugin, 
 	return nil
 }
 
-func (o *OpenStack) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
+// GetServer gets a Minecraft server on OpenStack.
+func (o *OpenStack) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
 	ctx := context.Background()
 	server, err := servers.Get(ctx, o.computeClient, id).Extract()
 	if err != nil {

@@ -17,7 +17,7 @@ var update = flag.Bool("update", false, "update golden files")
 func loadGolden(t *testing.T, name string) string {
 	t.Helper()
 	path := filepath.Join("testdata", name+".golden")
-	data, err := os.ReadFile(path)
+	data, err := os.ReadFile(path) //nolint:gosec // path is constructed from test name, not user input
 	require.NoError(t, err, "failed to read golden file: %s", path)
 	return string(data)
 }
@@ -29,7 +29,7 @@ func updateGolden(t *testing.T, name string, actual string) {
 		return
 	}
 	path := filepath.Join("testdata", name+".golden")
-	err := os.WriteFile(path, []byte(actual), 0644)
+	err := os.WriteFile(path, []byte(actual), 0o644) //nolint:gosec // test golden files need to be readable
 	require.NoError(t, err, "failed to update golden file: %s", path)
 }
 

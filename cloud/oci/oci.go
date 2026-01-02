@@ -1,3 +1,4 @@
+// Package oci implements the Automation interface for Oracle Cloud Infrastructure.
 package oci
 
 import (
@@ -20,6 +21,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// OCI implements the Automation interface for Oracle Cloud Infrastructure.
 type OCI struct {
 	compute  core.ComputeClient
 	identity identity.IdentityClient
@@ -27,6 +29,7 @@ type OCI struct {
 	tmpl     *minctlTemplate.Template
 }
 
+// NewOCI creates a new OCI instance.
 func NewOCI() (*OCI, error) {
 	c, err := core.NewComputeClientWithConfigurationProvider(common.DefaultConfigProvider())
 	if err != nil {
@@ -67,6 +70,7 @@ func getTagKeys(tags map[string]string) []string {
 	return keys
 }
 
+// CreateServer creates a new Minecraft server on OCI.
 func (o *OCI) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	ctx := context.Background()
 
@@ -342,7 +346,7 @@ func (o *OCI) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 	zap.S().Infow("Oracle launching instance", "launchInstance", launchInstance)
 
 	instanceRequest := core.GetInstanceRequest{
-		InstanceId: launchInstance.Instance.Id,
+		InstanceId: launchInstance.Id,
 		RequestMetadata: helpers.GetRequestMetadataWithCustomizedRetryPolicy(func(r common.OCIOperationResponse) bool {
 			if converted, ok := r.Response.(core.GetInstanceResponse); ok {
 				return converted.LifecycleState != core.InstanceLifecycleStateRunning
@@ -386,6 +390,7 @@ func (o *OCI) CreateServer(args automation.ServerArgs) (*automation.ResourceResu
 	return nil, errors.New("no instance created")
 }
 
+// DeleteServer deletes a Minecraft server on OCI.
 func (o *OCI) DeleteServer(id string, args automation.ServerArgs) error {
 	ctx := context.Background()
 
@@ -531,6 +536,7 @@ func (o *OCI) DeleteServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// ListServer lists all Minecraft servers on OCI.
 func (o *OCI) ListServer() ([]automation.ResourceResults, error) {
 	ctx := context.Background()
 	tenancyOCID, err := common.DefaultConfigProvider().TenancyOCID()
@@ -591,6 +597,7 @@ func (o *OCI) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
+// UpdateServer updates a Minecraft server on OCI.
 func (o *OCI) UpdateServer(id string, args automation.ServerArgs) error {
 	server, err := o.GetServer(id, args)
 	if err != nil {
@@ -605,6 +612,7 @@ func (o *OCI) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on OCI.
 func (o *OCI) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	server, err := o.GetServer(id, args)
 	if err != nil {
@@ -626,7 +634,8 @@ func (o *OCI) UploadPlugin(id string, args automation.ServerArgs, plugin, destin
 	return nil
 }
 
-func (o *OCI) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
+// GetServer gets a Minecraft server on OCI.
+func (o *OCI) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
 	ctx := context.Background()
 	instance, err := o.compute.GetInstance(ctx, core.GetInstanceRequest{
 		InstanceId: common.String(id),

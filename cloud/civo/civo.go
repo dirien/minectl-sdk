@@ -1,3 +1,4 @@
+// Package civo implements the Automation interface for Civo cloud provider.
 package civo
 
 import (
@@ -15,11 +16,13 @@ import (
 	"go.uber.org/zap"
 )
 
+// Civo implements the Automation interface for Civo.
 type Civo struct {
 	client *civogo.Client
 	tmpl   *minctlTemplate.Template
 }
 
+// NewCivo creates a new Civo instance.
 func NewCivo(apiKey, region string) (*Civo, error) {
 	client, err := civogo.NewClient(apiKey, region)
 	if err != nil {
@@ -36,6 +39,7 @@ func NewCivo(apiKey, region string) (*Civo, error) {
 	return do, nil
 }
 
+// CreateServer creates a new Minecraft server on Civo.
 func (c *Civo) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
@@ -148,6 +152,7 @@ func (c *Civo) CreateServer(args automation.ServerArgs) (*automation.ResourceRes
 	}, err
 }
 
+// DeleteServer deletes a Minecraft server on Civo.
 func (c *Civo) DeleteServer(id string, args automation.ServerArgs) error {
 	_, err := c.client.DeleteInstance(id)
 	if err != nil {
@@ -177,6 +182,7 @@ func (c *Civo) DeleteServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// ListServer lists all Minecraft servers on Civo.
 func (c *Civo) ListServer() ([]automation.ResourceResults, error) {
 	var result []automation.ResourceResults
 	instances, err := c.client.ListAllInstances()
@@ -210,6 +216,7 @@ func (c *Civo) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
+// UpdateServer updates a Minecraft server on Civo.
 func (c *Civo) UpdateServer(id string, args automation.ServerArgs) error {
 	instance, err := c.client.GetInstance(id)
 	if err != nil {
@@ -225,6 +232,7 @@ func (c *Civo) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on Civo.
 func (c *Civo) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	instance, err := c.client.GetInstance(id)
 	if err != nil {
@@ -244,6 +252,7 @@ func (c *Civo) UploadPlugin(id string, args automation.ServerArgs, plugin, desti
 	return nil
 }
 
+// GetServer gets a Minecraft server on Civo.
 func (c *Civo) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
 	instance, err := c.client.GetInstance(id)
 	if err != nil {

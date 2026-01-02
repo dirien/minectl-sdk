@@ -1,3 +1,4 @@
+// Package hetzner implements the Automation interface for Hetzner cloud provider.
 package hetzner
 
 import (
@@ -16,11 +17,13 @@ import (
 	"github.com/hetznercloud/hcloud-go/v2/hcloud"
 )
 
+// Hetzner implements the Automation interface for Hetzner.
 type Hetzner struct {
 	client *hcloud.Client
 	tmpl   *minctlTemplate.Template
 }
 
+// NewHetzner creates a new Hetzner instance.
 func NewHetzner(apiKey string) (*Hetzner, error) {
 	client := hcloud.NewClient(hcloud.WithToken(apiKey))
 	tmpl, err := minctlTemplate.NewTemplateCloudConfig()
@@ -34,6 +37,7 @@ func NewHetzner(apiKey string) (*Hetzner, error) {
 	return hetzner, nil
 }
 
+// CreateServer creates a new Minecraft server on Hetzner.
 func (h *Hetzner) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
@@ -120,12 +124,13 @@ func (h *Hetzner) CreateServer(args automation.ServerArgs) (*automation.Resource
 	return &automation.ResourceResults{
 		ID:       strconv.FormatInt(server.ID, 10),
 		Name:     server.Name,
-		Region:   server.Datacenter.Location.Name,
+		Region:   server.Location.Name,
 		PublicIP: server.PublicNet.IPv4.IP.String(),
 		Tags:     hetznerLabelsToTags(server.Labels),
 	}, err
 }
 
+// DeleteServer deletes a Minecraft server on Hetzner.
 func (h *Hetzner) DeleteServer(id string, args automation.ServerArgs) error {
 	serverID, _ := strconv.ParseInt(id, 10, 64)
 	server, _, err := h.client.Server.GetByID(context.Background(), serverID)
@@ -164,9 +169,6 @@ func (h *Hetzner) DeleteServer(id string, args automation.ServerArgs) error {
 	if err != nil {
 		return err
 	}
-	if err != nil {
-		return err
-	}
 
 	key, _, err := h.client.SSHKey.Get(context.Background(), fmt.Sprintf("%s-ssh", args.MinecraftResource.GetName()))
 	if err != nil {
@@ -187,6 +189,7 @@ func hetznerLabelsToTags(label map[string]string) string {
 	return strings.Join(tags, ",")
 }
 
+// ListServer lists all Minecraft servers on Hetzner.
 func (h *Hetzner) ListServer() ([]automation.ResourceResults, error) {
 	servers, err := h.client.Server.All(context.Background())
 	if err != nil {
@@ -199,7 +202,7 @@ func (h *Hetzner) ListServer() ([]automation.ResourceResults, error) {
 				result = append(result, automation.ResourceResults{
 					ID:       strconv.FormatInt(server.ID, 10),
 					Name:     server.Name,
-					Region:   server.Datacenter.Location.Name,
+					Region:   server.Location.Name,
 					PublicIP: server.PublicNet.IPv4.IP.String(),
 					Tags:     hetznerLabelsToTags(server.Labels),
 				})
@@ -209,6 +212,7 @@ func (h *Hetzner) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
+// UpdateServer updates a Minecraft server on Hetzner.
 func (h *Hetzner) UpdateServer(id string, args automation.ServerArgs) error {
 	intID, _ := strconv.ParseInt(id, 10, 64)
 	instance, _, err := h.client.Server.GetByID(context.Background(), intID)
@@ -224,6 +228,7 @@ func (h *Hetzner) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on Hetzner.
 func (h *Hetzner) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	intID, _ := strconv.ParseInt(id, 10, 64)
 	instance, _, err := h.client.Server.GetByID(context.Background(), intID)
@@ -243,6 +248,7 @@ func (h *Hetzner) UploadPlugin(id string, args automation.ServerArgs, plugin, de
 	return nil
 }
 
+// GetServer gets a Minecraft server on Hetzner.
 func (h *Hetzner) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
 	intID, _ := strconv.ParseInt(id, 10, 64)
 	instance, _, err := h.client.Server.GetByID(context.Background(), intID)
@@ -252,7 +258,7 @@ func (h *Hetzner) GetServer(id string, _ automation.ServerArgs) (*automation.Res
 	return &automation.ResourceResults{
 		ID:       strconv.FormatInt(instance.ID, 10),
 		Name:     instance.Name,
-		Region:   instance.Datacenter.Location.Name,
+		Region:   instance.Location.Name,
 		PublicIP: instance.PublicNet.IPv4.IP.String(),
 		Tags:     hetznerLabelsToTags(instance.Labels),
 	}, err

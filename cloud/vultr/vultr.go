@@ -1,3 +1,4 @@
+// Package vultr implements the Automation interface for Vultr cloud provider.
 package vultr
 
 import (
@@ -17,11 +18,13 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// Vultr implements the Automation interface for Vultr.
 type Vultr struct {
 	client *govultr.Client
 	tmpl   *minctlTemplate.Template
 }
 
+// NewVultr creates a new Vultr instance.
 func NewVultr(apiKey string) (*Vultr, error) {
 	config := &oauth2.Config{}
 	ctx := context.Background()
@@ -38,6 +41,7 @@ func NewVultr(apiKey string) (*Vultr, error) {
 	return vultr, nil
 }
 
+// CreateServer creates a new Minecraft server on Vultr.
 func (v *Vultr) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
@@ -106,6 +110,7 @@ func (v *Vultr) CreateServer(args automation.ServerArgs) (*automation.ResourceRe
 	}, err
 }
 
+// DeleteServer deletes a Minecraft server on Vultr.
 func (v *Vultr) DeleteServer(id string, args automation.ServerArgs) error {
 	sshKeys, _, _, err := v.client.SSHKey.List(context.Background(), nil)
 	if err != nil {
@@ -127,6 +132,7 @@ func (v *Vultr) DeleteServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// ListServer lists all Minecraft servers on Vultr.
 func (v *Vultr) ListServer() ([]automation.ResourceResults, error) {
 	instances, _, _, err := v.client.Instance.List(context.Background(), nil)
 	if err != nil {
@@ -149,6 +155,7 @@ func (v *Vultr) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
+// UpdateServer updates a Minecraft server on Vultr.
 func (v *Vultr) UpdateServer(id string, args automation.ServerArgs) error {
 	instance, _, err := v.client.Instance.Get(context.Background(), id)
 	if err != nil {
@@ -163,6 +170,7 @@ func (v *Vultr) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on Vultr.
 func (v *Vultr) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	instance, _, err := v.client.Instance.Get(context.Background(), id)
 	if err != nil {
@@ -180,6 +188,7 @@ func (v *Vultr) UploadPlugin(id string, args automation.ServerArgs, plugin, dest
 	return nil
 }
 
+// GetServer gets a Minecraft server on Vultr.
 func (v *Vultr) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
 	instance, _, err := v.client.Instance.Get(context.Background(), id)
 	if err != nil {

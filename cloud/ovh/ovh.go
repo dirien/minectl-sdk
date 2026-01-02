@@ -1,3 +1,4 @@
+// Package ovh implements the Automation interface for OVHcloud cloud provider.
 package ovh
 
 import (
@@ -15,11 +16,13 @@ import (
 	ovhsdk "github.com/dirien/ovh-go-sdk/pkg/sdk"
 )
 
+// OVHcloud implements the Automation interface for OVHcloud.
 type OVHcloud struct {
 	client *ovhsdk.OVHcloud
 	tmpl   *minctlTemplate.Template
 }
 
+// NewOVHcloud creates a new OVHcloud instance.
 func NewOVHcloud(endpoint, appKey, appSecret, consumerKey, serviceName, region string) (*OVHcloud, error) {
 	client, err := ovhsdk.NewOVHClient(endpoint, appKey, appSecret, consumerKey, region, serviceName)
 	if err != nil {
@@ -35,6 +38,7 @@ func NewOVHcloud(endpoint, appKey, appSecret, consumerKey, serviceName, region s
 	}, nil
 }
 
+// CreateServer creates a new Minecraft server on OVHcloud.
 func (o *OVHcloud) CreateServer(args automation.ServerArgs) (*automation.ResourceResults, error) {
 	publicKey, err := cloud.GetSSHPublicKey(args)
 	if err != nil {
@@ -155,6 +159,7 @@ func (o *OVHcloud) CreateServer(args automation.ServerArgs) (*automation.Resourc
 	}, err
 }
 
+// DeleteServer deletes a Minecraft server on OVHcloud.
 func (o *OVHcloud) DeleteServer(id string, args automation.ServerArgs) error {
 	keys, err := o.client.ListSSHKeys(context.Background())
 	if err != nil {
@@ -207,6 +212,7 @@ func (o *OVHcloud) DeleteServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// ListServer lists all Minecraft servers on OVHcloud.
 func (o *OVHcloud) ListServer() ([]automation.ResourceResults, error) {
 	instances, err := o.client.ListInstance(context.Background())
 	if err != nil {
@@ -233,6 +239,7 @@ func (o *OVHcloud) ListServer() ([]automation.ResourceResults, error) {
 	return result, nil
 }
 
+// UpdateServer updates a Minecraft server on OVHcloud.
 func (o *OVHcloud) UpdateServer(id string, args automation.ServerArgs) error {
 	instance, err := o.client.GetInstance(context.Background(), id)
 	if err != nil {
@@ -251,6 +258,7 @@ func (o *OVHcloud) UpdateServer(id string, args automation.ServerArgs) error {
 	return nil
 }
 
+// UploadPlugin uploads a plugin to a Minecraft server on OVHcloud.
 func (o *OVHcloud) UploadPlugin(id string, args automation.ServerArgs, plugin, destination string) error {
 	instance, err := o.client.GetInstance(context.Background(), id)
 	if err != nil {
@@ -276,7 +284,8 @@ func (o *OVHcloud) UploadPlugin(id string, args automation.ServerArgs, plugin, d
 	return nil
 }
 
-func (o *OVHcloud) GetServer(id string, args automation.ServerArgs) (*automation.ResourceResults, error) {
+// GetServer gets a Minecraft server on OVHcloud.
+func (o *OVHcloud) GetServer(id string, _ automation.ServerArgs) (*automation.ResourceResults, error) {
 	instance, err := o.client.GetInstance(context.Background(), id)
 	if err != nil {
 		return nil, err
