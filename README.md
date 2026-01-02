@@ -9,7 +9,7 @@ SDK for every minectl product
 
 ## Breaking changes
 
-### v0.9.0
+### v0.21.0
 
 - **GCE**: Refactored authentication to use Application Default Credentials (ADC) instead of JSON keyfile.
   - `NewGCE(keyfile, zone string)` changed to `NewGCE(zone string)`
