@@ -1,7 +1,8 @@
+version: "2"
+
 linters:
   enable:
     - thelper
-    - gofumpt
     - tparallel
     - unconvert
     - unparam
@@ -9,15 +10,18 @@ linters:
     - revive
     - forbidigo
     - tagliatelle
-    - typecheck
     - goconst
     - gocritic
     - gocyclo
     - govet
     - errcheck
     - gosec
-    - goimports
     - nolintlint
+
+formatters:
+  enable:
+    - gofumpt
+    - goimports
 
 linters-settings:
   forbidigo:

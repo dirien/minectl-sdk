@@ -2,7 +2,6 @@ package gce
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -16,6 +15,7 @@ import (
 	minctlTemplate "github.com/dirien/minectl-sdk/template"
 	"github.com/dirien/minectl-sdk/update"
 	"github.com/pkg/errors"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/option"
@@ -40,35 +40,67 @@ type GCE struct {
 	tmpl               *minctlTemplate.Template
 }
 
-func NewGCE(keyfile, zone string) (*GCE, error) {
-	file, err := os.ReadFile(keyfile)
-	if err != nil {
-		return nil, err
-	}
-	var cred Credentials
-	err = json.Unmarshal(file, &cred)
-	if err != nil {
-		return nil, err
-	}
-	computeService, err := compute.NewService(context.Background(), option.WithCredentialsJSON(file))
-	if err != nil {
-		return nil, err
+// NewGCE creates a new GCE instance using Application Default Credentials (ADC).
+// Authentication is handled automatically via the standard Google credential chain:
+// 1. GOOGLE_APPLICATION_CREDENTIALS environment variable (path to service account JSON)
+// 2. gcloud CLI authentication (gcloud auth application-default login)
+// 3. GCE metadata service (when running on Google Cloud)
+//
+// Required environment variables:
+// - GOOGLE_PROJECT: The GCP project ID
+// - GOOGLE_SERVICE_ACCOUNT_EMAIL: The service account email (for OS Login SSH access)
+//
+// Optional:
+// - GOOGLE_APPLICATION_CREDENTIALS: Path to service account JSON (if not using gcloud CLI auth)
+func NewGCE(zone string) (*GCE, error) {
+	ctx := context.Background()
+
+	// Get project ID from environment
+	projectID := os.Getenv("GOOGLE_PROJECT")
+	if projectID == "" {
+		return nil, errors.New("GOOGLE_PROJECT environment variable is required")
 	}
 
-	userService, err := oslogin.NewService(context.Background(), option.WithCredentialsJSON(file))
-	if err != nil {
-		return nil, err
+	// Get service account email from environment (required for OS Login)
+	serviceAccountEmail := os.Getenv("GOOGLE_SERVICE_ACCOUNT_EMAIL")
+	if serviceAccountEmail == "" {
+		return nil, errors.New("GOOGLE_SERVICE_ACCOUNT_EMAIL environment variable is required")
 	}
+
+	// Use Application Default Credentials
+	// This supports:
+	// - GOOGLE_APPLICATION_CREDENTIALS env var pointing to service account JSON
+	// - gcloud auth application-default login
+	// - GCE metadata service
+	creds, err := google.FindDefaultCredentials(ctx, compute.ComputeScope, oslogin.ComputeScope)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to find default credentials. Run 'gcloud auth application-default login' or set GOOGLE_APPLICATION_CREDENTIALS")
+	}
+
+	computeService, err := compute.NewService(ctx, option.WithCredentials(creds))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create compute service")
+	}
+
+	userService, err := oslogin.NewService(ctx, option.WithCredentials(creds))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create oslogin service")
+	}
+
 	tmpl, err := minctlTemplate.NewTemplateBash()
 	if err != nil {
 		return nil, err
 	}
+
+	// Extract service account ID from email (the part before @)
+	serviceAccountID := strings.Split(serviceAccountEmail, "@")[0]
+
 	return &GCE{
 		client:             computeService,
-		projectID:          cred.ProjectID,
+		projectID:          projectID,
 		user:               userService,
-		serviceAccountName: cred.ClientEmail,
-		serviceAccountID:   cred.ClientID,
+		serviceAccountName: serviceAccountEmail,
+		serviceAccountID:   serviceAccountID,
 		zone:               zone,
 		tmpl:               tmpl,
 	}, nil

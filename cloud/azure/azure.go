@@ -27,7 +27,17 @@ type Azure struct {
 	tmpl           *minctlTemplate.Template
 }
 
-func NewAzure(authFile string) (*Azure, error) {
+// NewAzure creates a new Azure instance using DefaultAzureCredential.
+// Authentication is handled automatically via the Azure credential chain:
+// 1. Environment variables (AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET)
+// 2. Managed identity (when running on Azure)
+// 3. Azure CLI authentication (az login)
+// 4. Azure PowerShell authentication
+// 5. Azure Developer CLI authentication
+//
+// Required environment variables:
+// - AZURE_SUBSCRIPTION_ID: The Azure subscription ID
+func NewAzure() (*Azure, error) {
 	cred, err := azidentity.NewDefaultAzureCredential(nil)
 	if err != nil {
 		return nil, err
