@@ -23,7 +23,7 @@ require (
 	github.com/gophercloud/gophercloud/v2 v2.9.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hetznercloud/hcloud-go/v2 v2.33.0
-	github.com/linode/linodego v1.63.0
+	github.com/linode/linodego v1.64.0
 	github.com/melbahja/goph v1.4.0
 	github.com/oracle/oci-go-sdk/v65 v65.105.2
 	github.com/pkg/errors v0.9.1
